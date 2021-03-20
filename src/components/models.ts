@@ -6,3 +6,7 @@ export interface Todo {
 export interface Meta {
   totalCount: number;
 }
+
+export interface LoginFunc {
+  (username: string, password: string): Promise<null>;
+}
