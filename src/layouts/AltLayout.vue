@@ -20,7 +20,7 @@
     </q-header>
 
     <q-drawer show-if-above v-model="right" side="right" bordered>
-      <!-- drawer content -->
+      <side-bar />
     </q-drawer>
 
     <q-page-container>
@@ -30,10 +30,14 @@
 </template>
 
 <script>
+import SideBar from 'components/SideBar.vue';
+
 export default {
+  components: { SideBar },
   data() {
     return {
       right: false,
+      components: { SideBar },
     };
   },
 };
