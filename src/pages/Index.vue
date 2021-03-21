@@ -1,6 +1,16 @@
 <template>
   <q-page class="row justify-center items-center">
-    <login-form :login="login" :register="register"></login-form>
+    <q-img class="col-12 col-md-4" src="~assets/login.webp"
+      ><div class="absolute-bottom">
+        <div class="text-h4">离线托管</div>
+        <div class="text-subtitle">登录/注册</div>
+      </div></q-img
+    >
+    <login-form
+      class="col-12 col-md-4"
+      :login="login"
+      :register="register"
+    ></login-form>
   </q-page>
 </template>
 
@@ -10,16 +20,18 @@ import LoginForm from 'components/LoginForm.vue';
 import { defineComponent, ref } from '@vue/composition-api';
 import api from '../api';
 
-function sleep(ms: number): Promise<null> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export default defineComponent({
   name: 'PageIndex',
   components: { LoginForm },
   methods: {
-    login: api.userLogin,
-    register: api.userRegister,
+    login: async function (username: string, password: string) {
+      const response = await api.userLogin(username, password);
+      api.token.set(response.data.token);
+    },
+    register: async function (username: string, password: string) {
+      const response = await api.userRegister(username, password);
+      api.token.set(response.data.token);
+    },
   },
   data: () => {
     return { password: '', username: '' };
