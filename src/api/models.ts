@@ -30,7 +30,7 @@ export interface GameInfoData {
     isPause: boolean;
     nextAutoRunTime: string;
   };
-  PlayerStatus: {
+  PlayerStatus?: {
     LongMenBi: number;
     YuanShi: { Android: number; iOS: number };
     UserName: string;
@@ -47,7 +47,7 @@ export interface GameInfoData {
     YueKa: { Has: boolean; Start: number; End: number };
     Mishu: { Mishu: string; Skin: string };
   };
-  inventory: { Id: string; Quantity: number; CNName: string }[];
+  inventory?: { Id: string; Quantity: number; CNName: string }[];
   log: {
     id: number;
     account: string;
