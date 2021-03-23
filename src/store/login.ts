@@ -2,6 +2,8 @@ import { Module, ActionTree, GetterTree, MutationTree } from 'vuex';
 import { LocalStorage } from 'quasar';
 import { StateInterface } from './index';
 import api from '../api';
+import Vue from 'vue';
+import { QVueGlobals } from 'quasar';
 
 export interface AccountObject {
   username: string;
@@ -19,6 +21,8 @@ const state = function(): LoginStateInterface {
 
 const actions: ActionTree<LoginStateInterface, StateInterface> = {
   async refreshToken(state) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const quasar = Vue.prototype.$q as QVueGlobals;
     try {
       const result = await api.verifyToken();
       state.commit('login', {
@@ -28,6 +32,15 @@ const actions: ActionTree<LoginStateInterface, StateInterface> = {
       });
     } catch (err) {
       state.commit('logout');
+      quasar.notify({
+        caption: '在刷新登录凭证中出现问题',
+        message: String(err),
+        color: 'negative',
+        closeBtn: true,
+        timeout: 10 * 1000,
+        progress: true,
+        position: 'center'
+      });
       throw err;
     }
   },
