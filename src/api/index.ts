@@ -1,9 +1,7 @@
 import { axios } from '../boot/axios';
 import {
   GeneralResponse,
-  UserLoginData,
-  UserRegisterData,
-  VerifyTokenData,
+  UserInfoData,
   GameAccountData,
   GameInfoData
 } from './models';
@@ -55,18 +53,18 @@ class ApiConnection {
     return (await this._processRequest('/auth/userlogin', {
       username,
       password
-    })) as GeneralResponse<UserLoginData>;
+    })) as GeneralResponse<UserInfoData>;
   }
   static async verifyToken() {
     return (await this._processRequest('/auth/verifyToken')) as GeneralResponse<
-      VerifyTokenData
+      UserInfoData
     >;
   }
   static async userRegister(username: string, password: string) {
     return (await this._processRequest('/auth/userregister', {
       username,
       password
-    })) as GeneralResponse<UserRegisterData>;
+    })) as GeneralResponse<UserInfoData>;
   }
   static async getGamesAccounts() {
     return (await this._processRequest(
