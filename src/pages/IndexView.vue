@@ -1,34 +1,34 @@
 <template>
   <q-page class="row justify-center items-center">
     <q-card>
-      <q-timeline color="primary">
-        <q-timeline-entry
-          v-for="activity in activitiesList"
-          :key="activity.timestamp"
-          :title="activity.message"
-          :subtitle="activity.time"
-          :heading="activity.time"
-        ></q-timeline-entry>
-      </q-timeline>
+      <q-card-section>
+        <q-timeline color="primary">
+          <q-timeline-entry
+            v-for="activity in activitiesList"
+            :key="activity.time"
+            :title="activity.message"
+            :subtitle="activity.account"
+            :heading="activity.time.toLocaleString()"
+          ></q-timeline-entry> </q-timeline
+      ></q-card-section>
     </q-card>
   </q-page>
 </template>
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import api from '../api';
+import { Store } from 'vuex';
+import { StateInterface } from '../store';
 
 export default defineComponent({
   props: {},
   data: function () {
-    return {
-      activities: new Map() as Map<string, Map<number, string>>,
-      debounce: new Map() as Map<string, string>,
-      connected: false,
-    };
+    return {};
   },
   methods: {
     makeWebsocketConnection: function () {
-      const token = api.token.get()?.toString();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const store: Store<StateInterface> = this.$store;
+      const token = store.state.login.account?.token;
       if (!token) {
         void this.$router.push('/login');
         return;
@@ -37,7 +37,7 @@ export default defineComponent({
       const ws = new WebSocket(`wss://${host}/ws/?token=${token}`);
 
       ws.onopen = (event) => {
-        this.connected = true;
+        store.commit('activity/connect');
         console.timeLog('WebSocket connection opened', event);
         this.$q.notify({
           color: 'positive',
@@ -46,27 +46,11 @@ export default defineComponent({
         });
       };
       ws.onmessage = (event) => {
-        const received = new Map(
+        const received: Map<string, string> = new Map(
           Object.entries(JSON.parse(event.data as string))
         );
-        received.forEach((value, key, map) => {
-          if (this.debounce.get(key) == value) {
-            return;
-          }
-          this.$q.notify({
-            icon: 'notifications',
-            message: value as string,
-            caption: `帐号: ${key}`,
-            position: 'bottom-right',
-            color: 'dark',
-            progress: true,
-            timeout: 10 * 1000,
-          });
-          this.debounce.set(key, value as string);
-          const activity =
-            this.activities.get(key) || (new Map() as Map<number, string>);
-          activity.set(Date.now(), value as string);
-          this.activities.set(key, activity);
+        received.forEach((message, account, map) => {
+          store.commit('activity/create', { account, message });
         });
       };
       ws.onclose = ws.onerror = (event) => {
@@ -83,23 +67,23 @@ export default defineComponent({
   },
   computed: {
     activitiesList: function () {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const store: Store<StateInterface> = this.$store;
       let list = [] as Array<{
-        time: string;
-        timestamp: number;
+        time: Date;
         account: string;
         message: string;
       }>;
-      this.activities.forEach((activity, account, map) => {
-        activity.forEach((message, timestamp, map) => {
+      store.state.activity.activities.forEach((activity, account, map) => {
+        activity.forEach((message, time, map) => {
           list.push({
-            time: new Date(timestamp).toLocaleString(),
-            timestamp,
+            time,
             message,
             account,
           });
         });
       });
-      list.sort((a, b) => a.timestamp - b.timestamp).reverse();
+      list.sort((a, b) => a.time.getTime() - b.time.getTime()).reverse();
       return list;
     },
   },

@@ -7,11 +7,14 @@ import {
 } from './models';
 import { AxiosError } from 'axios';
 import Vue from 'vue';
+import { Store } from 'vuex';
 import { QVueGlobals } from 'quasar';
-import { store } from '../store';
+import { StateInterface } from '../store';
 
 class ApiConnection {
   private static async _processRequest(endpoint: string, data?: unknown) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const store = Vue.prototype.$store as Store<StateInterface>;
     const token = store.state.login.account?.token;
     try {
       const response = await axios.post(endpoint, data || {}, {

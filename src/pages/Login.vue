@@ -25,12 +25,12 @@ export default defineComponent({
   components: { LoginForm },
   methods: {
     login: async function (username: string, password: string) {
-      const response = await api.userLogin(username, password);
-      api.token.set(response.data.token);
+      await this.$store.dispatch('login/loginAccount', { username, password });
+      await this.$router.push('/');
     },
     register: async function (username: string, password: string) {
-      const response = await api.userRegister(username, password);
-      api.token.set(response.data.token);
+      await api.userRegister(username, password);
+      await this.login(username, password);
     },
   },
   data: () => {

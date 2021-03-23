@@ -28,6 +28,8 @@
 import { defineComponent } from '@vue/composition-api';
 import api from '../api';
 import { GameAccountData } from '../api/models';
+import { Store } from 'vuex';
+import { StateInterface } from '../store';
 
 export default defineComponent({
   props: {},
@@ -39,34 +41,22 @@ export default defineComponent({
   },
   methods: {
     refreshAccountData: async function () {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const store: Store<StateInterface> = this.$store;
+      if (!store.state.login.account) {
+        return void this.$router.push('/login');
+      }
       try {
         const result = await api.getGamesAccounts();
         this.accounts = result.data;
       } catch (err) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.error(`Failed to refresh account data, error ${err}`);
-      }
-    },
-    checkUserLogin: async function () {
-      try {
-        const userTokenData = await api.verifyToken();
-        api.token.set(userTokenData.data.token);
-        console.info(
-          `Succeed to refresh user ${userTokenData.data.userID} JWT token`
-        );
-        this.logined = true;
-      } catch (err) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.error(`Failed to refresh user token, error ${err}`);
-        this.logined = false;
+        console.log(`Failed to refresh account data, error ${String(err)}`);
       }
     },
   },
   mounted: function () {
-    void this.checkUserLogin();
     void this.refreshAccountData();
     setInterval(() => void this.refreshAccountData(), 10 * 1000);
-    setInterval(() => void this.checkUserLogin(), 10 * 60 * 1000);
   },
   watch: {
     // logined: function (before: boolean, after: boolean) {

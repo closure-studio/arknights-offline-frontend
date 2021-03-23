@@ -1,7 +1,10 @@
 <template>
   <q-page class="row justify-center items-center" padding>
     <h4 v-if="!account">请先在右侧选择一个游戏帐号</h4>
-    <div v-else-if="!account.PlayerStatus" class="text-center">
+    <div
+      v-else-if="!account.PlayerStatus || !account.inventory"
+      class="text-center"
+    >
       <div class="text-h4">请先登录该帐号</div>
       <q-badge color="negative">{{ gameAccount }}</q-badge>
       <div class="text-subtitle">如已登录, 请稍等</div>
@@ -37,9 +40,18 @@
           <div class="text-h6">信息</div>
           <q-separator />
           <q-card-section>
-            <q-chip icon="recent_actors" color="positive" square
-              ><b>欢迎回来, {{ account.PlayerStatus.UserName }}</b></q-chip
-            >
+            <q-banner rounded class="shadow-1">
+              <q-avatar>
+                <q-img
+                  class="shadow-1"
+                  sizes="100px"
+                  :src="resourceURL(account.PlayerStatus.TouXiang)"
+              /></q-avatar>
+              欢迎回来, <b>{{ account.PlayerStatus.UserName }}</b>
+
+              <q-separator />
+            </q-banner>
+
             <q-space />
             <q-chip icon="payments"
               >龙门币: {{ account.PlayerStatus.LongMenBi }}</q-chip
@@ -55,6 +67,7 @@
               >理智: {{ account.PlayerStatus.LiZhi }} /
               {{ account.PlayerStatus.LiZhiMax }}</q-chip
             >
+
             <q-chip icon="auto_awesome"
               >经验: {{ account.PlayerStatus.Exp }}</q-chip
             >
@@ -69,7 +82,11 @@
 
           <q-separator />
           <div>
-            暂停中:<q-toggle v-model="paused" color="accent"></q-toggle>
+            暂停中:<q-toggle
+              v-model="paused"
+              color="accent"
+              @input="pauseToggle"
+            ></q-toggle>
           </div>
           <div>
             下一次运行:
@@ -79,6 +96,18 @@
         <q-tab-panel name="inventory">
           <div class="text-h6">背包</div>
           Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          <q-space />
+          <q-chip v-for="item in account.inventory" :key="item.Id" size="xl">
+            <q-avatar square size="xl">
+              <q-img :src="resourceURL(item.Id)" basic></q-img
+            ></q-avatar>
+            <div>
+              {{ item.CNName
+              }}<q-badge align="middle" outline color="primary">{{
+                item.Quantity
+              }}</q-badge>
+            </div></q-chip
+          >
         </q-tab-panel>
 
         <q-tab-panel name="log">
@@ -140,6 +169,28 @@ export default defineComponent({
     },
   },
   methods: {
+    pauseToggle: async function (value: boolean) {
+      if (!this.gameAccount) {
+        return;
+      }
+      try {
+        this.$q.loading.show();
+        if (value) {
+          await api.setGamePause(this.gameAccount);
+        } else {
+          await api.setGameResume(this.gameAccount);
+        }
+      } finally {
+        this.$q.loading.hide();
+      }
+      this.$q.notify({
+        message: '暂停状态修改成功',
+        caption: `已经修改为 ${String(value)}`,
+        type: 'positive',
+        position: 'bottom',
+        progress: true,
+      });
+    },
     getGameAccounData: async function () {
       const account = this.gameAccount;
       const bar = this.$refs.bar as QAjaxBar;
@@ -172,6 +223,9 @@ export default defineComponent({
           this.$q.loading.hide();
         }
       }
+    },
+    resourceURL: function (name: string): string {
+      return `https://ak.nai-ve.com/res/${name}.png`;
     },
   },
   mounted: function () {
