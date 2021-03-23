@@ -5,14 +5,14 @@ import {
   GameAccountData,
   GameInfoData
 } from './models';
-import { LocalStorage } from 'quasar';
 import { AxiosError } from 'axios';
 import Vue from 'vue';
 import { QVueGlobals } from 'quasar';
+import { store } from '../store';
 
 class ApiConnection {
   private static async _processRequest(endpoint: string, data?: unknown) {
-    const token = this.token.get();
+    const token = store.state.login.account?.token;
     try {
       const response = await axios.post(endpoint, data || {}, {
         headers: !!token ? { Token: token } : {}
@@ -41,14 +41,6 @@ class ApiConnection {
       throw err;
     }
   }
-  static token = {
-    get() {
-      return LocalStorage.getItem('JWT');
-    },
-    set(token: string) {
-      LocalStorage.set('JWT', token);
-    }
-  };
   static async userLogin(username: string, password: string) {
     return (await this._processRequest('/auth/userlogin', {
       username,
