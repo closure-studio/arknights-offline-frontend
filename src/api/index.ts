@@ -29,15 +29,19 @@ class ApiConnection {
         const error = err as AxiosError<GeneralResponse>;
         if (!!error.response) {
           quasar.notify({
-            color: 'accent',
+            progress: true,
             position: 'top',
-            message: `Code ${error.response.status}: ${error.response.data.message}`
+            type: 'negative',
+            message: `服务器返回错误(${error.response.status})`,
+            caption: `${error.response.data.message}`
           });
         } else {
           quasar.notify({
-            color: 'red',
+            progress: true,
             position: 'top',
-            message: `Network Error: ${error.message}`
+            type: 'negative',
+            message: '网络请求错误',
+            caption: error.message
           });
         }
       }
