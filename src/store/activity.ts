@@ -5,11 +5,16 @@ export interface ActivityStateInterface {
   activities: Map<string, Map<Date, string>>;
   debounce: Map<string, string>;
   websocket: boolean;
+  listeners: Array<(account: string, message: string) => unknown>;
 }
 
 const state = function(): ActivityStateInterface {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  return { activities: new Map(), debounce: new Map(), websocket: false };
+  return {
+    activities: new Map() as Map<string, Map<Date, string>>,
+    debounce: new Map() as Map<string, string>,
+    websocket: false,
+    listeners: []
+  };
 };
 
 const actions: ActionTree<ActivityStateInterface, StateInterface> = {};
@@ -24,12 +29,18 @@ const mutations: MutationTree<ActivityStateInterface> = {
     activity.set(new Date(), message.message);
     state.activities.set(message.account, activity);
     state.debounce.set(message.account, message.message);
+    state.listeners.forEach(listener =>
+      listener(message.account, message.message)
+    );
   },
   connect(state) {
     state.websocket = true;
   },
   disconnect(state) {
     state.websocket = false;
+  },
+  listen(state, callback: (account: string, message: string) => unknown) {
+    state.listeners.push(callback);
   }
 };
 

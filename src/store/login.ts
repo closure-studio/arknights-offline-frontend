@@ -13,10 +13,11 @@ export interface AccountObject {
 
 export interface LoginStateInterface {
   account: AccountObject | null;
+  listeners: Array<(account: AccountObject | null) => unknown>;
 }
 
 const state = function(): LoginStateInterface {
-  return { account: null };
+  return { account: null, listeners: [] };
 };
 
 const actions: ActionTree<LoginStateInterface, StateInterface> = {
@@ -65,10 +66,15 @@ const mutations: MutationTree<LoginStateInterface> = {
     }
     LocalStorage.set('account', account);
     state.account = account;
+    state.listeners.forEach(listener => listener(account || null));
   },
   logout(state) {
     state.account = null;
     LocalStorage.remove('account');
+    state.listeners.forEach(listener => listener(null));
+  },
+  listen(state, callback: (account: AccountObject | null) => unknown) {
+    state.listeners.push(callback);
   }
 };
 
