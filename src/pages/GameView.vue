@@ -1,5 +1,9 @@
 <template>
-  <q-page class="row justify-center items-center" padding>
+  <q-page
+    class="row justify-center items-center"
+    padding
+    :style="backgroundStyle"
+  >
     <h4 v-if="!account">请先在右侧选择一个游戏帐号</h4>
     <div
       v-else-if="!account.PlayerStatus || !account.inventory"
@@ -11,11 +15,11 @@
       <q-space />
       <q-btn icon="vpn_key" @click="loginGame">登录该帐号</q-btn>
     </div>
-    <q-card v-else bordered>
+    <q-card v-else bordered class="col-12 col-md-6">
       <q-card-section>
         <div class="text-h4">游戏状态</div>
         <q-badge>帐号: {{ gameAccount }}</q-badge>
-        <q-btn icon="refresh" size="lt" flat @click="getGameAccounData"
+        <q-btn icon="refresh" size="md" flat @click="getGameAccounData"
           >刷新数据</q-btn
         >
       </q-card-section>
@@ -35,79 +39,92 @@
 
       <q-separator />
 
-      <q-tab-panels v-model="tab" animated>
+      <q-tab-panels v-model="tab" animated class="shadow-1">
         <q-tab-panel name="info">
           <div class="text-h6">信息</div>
           <q-separator />
           <q-card-section>
-            <q-banner rounded class="shadow-1">
-              <q-avatar>
-                <q-img
-                  class="shadow-1"
-                  sizes="100px"
-                  :src="resourceURL(account.PlayerStatus.TouXiang)"
-              /></q-avatar>
-              欢迎回来, <b>{{ account.PlayerStatus.UserName }}</b>
-
-              <q-separator />
-            </q-banner>
-
-            <q-space />
-            <q-chip icon="payments"
-              >龙门币: {{ account.PlayerStatus.LongMenBi }}</q-chip
-            >
-            <q-chip icon="bolt">等级: {{ account.PlayerStatus.Level }}</q-chip>
-            <q-chip
-              icon="mood"
-              :color="
-                account.PlayerStatus.LiZhi >= account.PlayerStatus.LiZhiMax
-                  ? 'warning'
-                  : 'info'
-              "
-              >理智: {{ account.PlayerStatus.LiZhi }} /
-              {{ account.PlayerStatus.LiZhiMax }}</q-chip
-            >
-
-            <q-chip icon="auto_awesome"
-              >经验: {{ account.PlayerStatus.Exp }}</q-chip
-            >
-            <q-chip icon="savings"
-              >信用: {{ account.PlayerStatus.XinYong }}</q-chip
-            >
-            <q-chip icon="catching_pokemon">
-              源石: Android:{{ account.PlayerStatus.YuanShi.Android }} iOS:
-              {{ account.PlayerStatus.YuanShi.iOS }}
-            </q-chip>
+            <div class="row q-pa-xs">
+              <q-img
+                class="shadow-1 col-4"
+                ratio="1"
+                :src="resourceURL(account.PlayerStatus.TouXiang)"
+              />
+              <q-card class="shadow-1 col-8">
+                <q-card-section
+                  ><div class="text-subtitle">
+                    欢迎回来: <b>{{ account.PlayerStatus.UserName }}</b>
+                  </div></q-card-section
+                >
+                <q-separator />
+                <q-card-section>
+                  <q-chip
+                    icon="mood"
+                    :color="
+                      account.PlayerStatus.LiZhi >=
+                      account.PlayerStatus.LiZhiMax
+                        ? 'warning'
+                        : 'info'
+                    "
+                    >理智: {{ account.PlayerStatus.LiZhi }} /
+                    {{ account.PlayerStatus.LiZhiMax }}</q-chip
+                  >
+                  <q-chip icon="bolt"
+                    >等级: {{ account.PlayerStatus.Level }}</q-chip
+                  >
+                  <q-space />
+                  <q-chip icon="catching_pokemon">
+                    源石: <q-icon name="android" />{{
+                      account.PlayerStatus.YuanShi.Android
+                    }}
+                    |<q-icon name="phone_iphone" />{{
+                      account.PlayerStatus.YuanShi.iOS
+                    }} </q-chip
+                  ><q-chip icon="payments"
+                    >龙门币: {{ account.PlayerStatus.LongMenBi }}</q-chip
+                  >
+                  <q-chip icon="auto_awesome"
+                    >经验: {{ account.PlayerStatus.Exp }}</q-chip
+                  >
+                  <q-chip icon="savings"
+                    >信用: {{ account.PlayerStatus.XinYong }}</q-chip
+                  ></q-card-section
+                >
+              </q-card>
+            </div>
           </q-card-section>
 
-          <q-separator />
-          <div>
-            暂停中:<q-toggle
-              v-model="paused"
-              color="accent"
-              @input="pauseToggle"
-            ></q-toggle>
-          </div>
-          <div>
-            下一次运行:
-            <q-badge>{{ account.systemInfo.nextAutoRunTime }}</q-badge>
-          </div>
+          <q-card-actions>
+            <div>
+              暂停中:<q-toggle
+                v-model="paused"
+                color="accent"
+                @input="pauseToggle"
+              ></q-toggle>
+            </div>
+            <div>
+              下一次运行:
+              <q-badge>{{ account.systemInfo.nextAutoRunTime }}</q-badge>
+            </div></q-card-actions
+          >
         </q-tab-panel>
         <q-tab-panel name="inventory">
           <div class="text-h6">背包</div>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          <q-space />
-          <q-chip v-for="item in account.inventory" :key="item.Id" size="xl">
-            <q-avatar square size="xl">
-              <q-img :src="resourceURL(item.Id)" basic></q-img
-            ></q-avatar>
-            <div>
-              {{ item.CNName
-              }}<q-badge align="middle" outline color="primary">{{
-                item.Quantity
-              }}</q-badge>
-            </div></q-chip
-          >
+          共 {{ account.inventory.length }} 种物品
+          <q-separator />
+          <q-intersection transition="fade">
+            <q-chip v-for="item in account.inventory" :key="item.Id" size="xl">
+              <q-avatar square size="xl">
+                <q-img :src="resourceURL(item.Id)" ratio="1"></q-img
+              ></q-avatar>
+              <div>
+                {{ item.CNName
+                }}<q-badge align="middle" outline color="primary">{{
+                  item.Quantity
+                }}</q-badge>
+              </div></q-chip
+            >
+          </q-intersection>
         </q-tab-panel>
 
         <q-tab-panel name="log">
@@ -137,6 +154,13 @@
       size="5px"
       skip-hijack
     />
+    <!-- <q-img
+      class="absolute-bottom-left"
+      v-if="account?.PlayerStatus"
+      :src="
+        resourceURL(account.PlayerStatus.Mishu.Skin, 'webp').replace('#', '_')
+      "
+    /> -->
   </q-page>
 </template>
 <script lang="ts">
@@ -159,6 +183,25 @@ export default defineComponent({
     gameAccount: function () {
       const account = this.$route.params?.account as string | undefined;
       return account;
+    },
+    backgroundStyle: function () {
+      if (this.account?.PlayerStatus?.Mishu) {
+        const url: string = this.resourceURL(
+          this.account.PlayerStatus.Mishu.Skin,
+          'webp'
+        ).replace('#', '_');
+        return {
+          'background-image': `url(${url})`,
+          'background-repeat': 'no-repeat',
+          'background-size': ' 40%',
+          'background-position': 'bottom left',
+        };
+      } else {
+        return {};
+      }
+    },
+    loadingBar: function (): QAjaxBar {
+      return this.$refs.bar as QAjaxBar;
     },
   },
   watch: {
@@ -193,16 +236,15 @@ export default defineComponent({
     },
     getGameAccounData: async function () {
       const account = this.gameAccount;
-      const bar = this.$refs.bar as QAjaxBar;
       if (!!account) {
         try {
-          bar.start();
+          this.loadingBar.start();
           const result = await api.getGameData(account);
           this.account = result.data;
         } catch {
           this.account = null;
         } finally {
-          bar.stop();
+          this.loadingBar.stop();
         }
       } else {
         this.account = null;
@@ -224,8 +266,9 @@ export default defineComponent({
         }
       }
     },
-    resourceURL: function (name: string): string {
-      return `https://ak.nai-ve.com/res/${name}.png`;
+    resourceURL: function (name: string, suffix?: string): string {
+      suffix = suffix || 'png';
+      return `https://ak.nai-ve.com/res/${name}.${suffix}`;
     },
   },
   mounted: function () {
