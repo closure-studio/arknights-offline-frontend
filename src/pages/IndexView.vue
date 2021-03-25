@@ -61,8 +61,22 @@ export default defineComponent({
         });
       };
     },
+    wsActivityListener: function (account: string, message: string) {
+      this.$q.notify({
+        type: 'info',
+        color: 'black',
+        position: 'bottom-left',
+        progress: true,
+        closeBtn: true,
+        message: message,
+        caption: `帐号 ${account}`,
+      });
+    },
   },
   mounted: function () {
+    this.$store.commit('activity/listen', (account: string, message: string) =>
+      this.wsActivityListener(account, message)
+    );
     void this.makeWebsocketConnection();
   },
   computed: {

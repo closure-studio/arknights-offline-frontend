@@ -4,17 +4,32 @@
     padding
     :style="backgroundStyle"
   >
-    <h4 v-if="!account">请先在右侧选择一个游戏帐号</h4>
-    <div
-      v-else-if="!account.PlayerStatus || !account.inventory"
-      class="text-center"
-    >
-      <div class="text-h4">请先登录该帐号</div>
-      <q-badge color="negative">{{ gameAccount }}</q-badge>
-      <div class="text-subtitle">如已登录, 请稍等</div>
-      <q-space />
-      <q-btn icon="vpn_key" @click="loginGame">登录该帐号</q-btn>
+    <div v-if="!(gameAccount && account)" class="absolute-center text-center">
+      <div class="text-h4">请先在右侧选择一个游戏帐号</div>
+      <q-btn icon="refresh" size="md" flat @click="getGameAccounData"
+        >刷新数据</q-btn
+      >
     </div>
+
+    <q-card
+      v-else-if="!(account.PlayerStatus && account.inventory)"
+      class="text-center col-6 shadow-1"
+    >
+      <q-card-section>
+        <div class="text-h4">请先登录该帐号</div>
+        <q-badge color="negative">{{ gameAccount }}</q-badge>
+        <div class="text-subtitle">如已登录, 请稍等</div>
+      </q-card-section>
+      <q-separator spaced />
+      <q-card-actions align="evenly">
+        <q-btn icon="vpn_key" @click="loginGame" flat color="positive"
+          >登录该帐号</q-btn
+        >
+        <q-btn icon="clear" @click="removeGame" flat color="negative"
+          >删除该帐号</q-btn
+        ></q-card-actions
+      >
+    </q-card>
     <q-card v-else bordered class="col-12 col-md-6">
       <q-card-section>
         <div class="text-h4">游戏状态</div>
@@ -109,6 +124,7 @@
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
+
     <q-ajax-bar
       ref="bar"
       position="bottom"
