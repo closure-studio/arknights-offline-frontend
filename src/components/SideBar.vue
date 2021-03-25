@@ -4,8 +4,8 @@
       <q-img src="~assets/background.webp"
         ><div class="absolute-bottom text-center">帐号信息</div></q-img
       >
-      <q-list bordered separator class="shadow-1">
-        <q-item v-if="userData">
+      <q-list bordered separator class="shadow-1" v-if="userData">
+        <q-item>
           <q-item-section avatar>
             <q-avatar color="accent" text-color="white">
               {{ userData.username[0].toUpperCase() }}
@@ -51,35 +51,9 @@
         v-if="loading"
         indeterminate
       />
-      <q-slide-transition>
-        <div v-show="add">
-          <q-separator />
-          <q-card-section class="shadow-1 column item-center">
-            <div class="text-subitle text-center">添加托管帐号</div>
-
-            <q-input label="游戏帐号" clearable></q-input>
-            <q-input label="游戏密码" clearable></q-input>
-            <q-btn flat color="primary">提交</q-btn>
-          </q-card-section>
-        </div>
-      </q-slide-transition>
-      <q-slide-transition>
-        <div v-show="remove">
-          <q-separator />
-          <q-card-section class="shadow-1 column item-center">
-            <div class="text-subitle text-center">请选择要删除的帐号</div>
-            <q-select
-              :options="accounts.map((value) => value.account)"
-              label="帐号"
-            />
-            <q-btn flat color="red">确认</q-btn>
-          </q-card-section>
-        </div>
-      </q-slide-transition>
 
       <q-card-actions class="absolute-bottom" align="evenly">
-        <q-btn flat color="primary" @click="add = !add">添加托管帐号</q-btn>
-        <q-btn flat color="red" @click="remove = !remove">删除托管帐号</q-btn>
+        <q-btn flat color="primary" @click="newAccount">添加托管帐号</q-btn>
         <q-btn flat icon="refresh" @click="refreshAccountData">刷新数据</q-btn>
       </q-card-actions>
     </q-card>
@@ -123,6 +97,55 @@ export default defineComponent({
       try {
         this.$q.loading.show();
         await api.delGame(account);
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
+    newAccount: async function () {
+      const account: string = await new Promise((resolve, reject) =>
+        this.$q
+          .dialog({
+            title: '录入帐号信息',
+            message: '请输入游戏帐号',
+            cancel: true,
+            persistent: true,
+            prompt: {
+              model: '',
+              type: 'text',
+              counter: true,
+              isValid: Boolean,
+            },
+          })
+          .onOk((data: string) => resolve(data))
+          .onCancel(reject)
+      );
+      const password: string = await new Promise((resolve, reject) =>
+        this.$q
+          .dialog({
+            title: '录入帐号信息',
+            message: `请输入帐号${account}的密码`,
+            cancel: true,
+            persistent: true,
+            prompt: {
+              model: '',
+              type: 'password',
+              counter: true,
+              isValid: Boolean,
+            },
+          })
+          .onOk((data: string) => resolve(data))
+          .onCancel(reject)
+      );
+      try {
+        this.$q.loading.show();
+        await api.createGame(account, password);
+        this.$q.notify({
+          type: 'positive',
+          message: '托管已成功添加',
+          caption: `帐号: ${account}`,
+          position: 'top',
+          progress: true,
+        });
       } finally {
         this.$q.loading.hide();
       }

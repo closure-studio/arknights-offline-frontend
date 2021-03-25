@@ -1,14 +1,14 @@
 <template>
   <q-page class="row justify-center items-center">
-    <q-card>
+    <q-card class="col-6 shadow-1">
       <q-card-section>
         <q-timeline color="primary">
           <q-timeline-entry
             v-for="activity in activitiesList"
             :key="activity.time"
-            :title="activity.message"
-            :subtitle="activity.account"
-            :heading="activity.time.toLocaleString()"
+            :title="activity.account"
+            :subtitle="activity.time.toLocaleString()"
+            :body="activity.message"
           ></q-timeline-entry> </q-timeline
       ></q-card-section>
     </q-card>
