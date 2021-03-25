@@ -33,7 +33,7 @@
         narrow-indicator
       >
         <q-tab name="info" label="信息" />
-        <q-tab name="inventory" label="背包" />
+        <q-tab name="inventory" label="库存" />
         <q-tab name="log" label="日志" />
       </q-tabs>
 
@@ -43,58 +43,9 @@
         <q-tab-panel name="info">
           <div class="text-h6">信息</div>
           <q-separator />
-          <q-card-section>
-            <div class="row q-pa-xs">
-              <q-img
-                class="shadow-1 col-4"
-                ratio="1"
-                :src="resourceURL(account.PlayerStatus.TouXiang)"
-              />
-              <q-card class="shadow-1 col-8">
-                <q-card-section
-                  ><div class="text-subtitle">
-                    欢迎回来: <b>{{ account.PlayerStatus.UserName }}</b>
-                  </div></q-card-section
-                >
-                <q-separator />
-                <q-card-section>
-                  <q-chip
-                    icon="mood"
-                    :color="
-                      account.PlayerStatus.LiZhi >=
-                      account.PlayerStatus.LiZhiMax
-                        ? 'warning'
-                        : 'info'
-                    "
-                    >理智: {{ account.PlayerStatus.LiZhi }} /
-                    {{ account.PlayerStatus.LiZhiMax }}</q-chip
-                  >
-                  <q-chip icon="bolt"
-                    >等级: {{ account.PlayerStatus.Level }}</q-chip
-                  >
-                  <q-space />
-                  <q-chip icon="catching_pokemon">
-                    源石: <q-icon name="android" />{{
-                      account.PlayerStatus.YuanShi.Android
-                    }}
-                    |<q-icon name="phone_iphone" />{{
-                      account.PlayerStatus.YuanShi.iOS
-                    }} </q-chip
-                  ><q-chip icon="payments"
-                    >龙门币: {{ account.PlayerStatus.LongMenBi }}</q-chip
-                  >
-                  <q-chip icon="auto_awesome"
-                    >经验: {{ account.PlayerStatus.Exp }}</q-chip
-                  >
-                  <q-chip icon="savings"
-                    >信用: {{ account.PlayerStatus.XinYong }}</q-chip
-                  ></q-card-section
-                >
-              </q-card>
-            </div>
-          </q-card-section>
+          <q-card-section> <game-detail-card :data="account" /></q-card-section>
 
-          <q-card-actions>
+          <q-card-actions align="evenly">
             <div>
               暂停中:<q-toggle
                 v-model="paused"
@@ -102,18 +53,29 @@
                 @input="pauseToggle"
               ></q-toggle>
             </div>
+            <q-btn icon="vpn_key" @click="loginGame" flat color="positive"
+              >立即登录该帐号</q-btn
+            >
+            <q-btn icon="clear" @click="removeGame" flat color="negative"
+              >删除该帐号</q-btn
+            >
             <div>
               下一次运行:
               <q-badge>{{ account.systemInfo.nextAutoRunTime }}</q-badge>
-            </div></q-card-actions
-          >
+            </div>
+          </q-card-actions>
         </q-tab-panel>
         <q-tab-panel name="inventory">
-          <div class="text-h6">背包</div>
+          <div class="text-h6">库存</div>
           共 {{ account.inventory.length }} 种物品
           <q-separator />
           <q-intersection transition="fade">
-            <q-chip v-for="item in account.inventory" :key="item.Id" size="xl">
+            <q-chip
+              v-for="item in account.inventory"
+              :key="item.Id"
+              size="xl"
+              class="shadow-1"
+            >
               <q-avatar square size="xl">
                 <q-img :src="resourceURL(item.Id)" ratio="1"></q-img
               ></q-avatar>
@@ -154,13 +116,6 @@
       size="5px"
       skip-hijack
     />
-    <!-- <q-img
-      class="absolute-bottom-left"
-      v-if="account?.PlayerStatus"
-      :src="
-        resourceURL(account.PlayerStatus.Mishu.Skin, 'webp').replace('#', '_')
-      "
-    /> -->
   </q-page>
 </template>
 <script lang="ts">
@@ -168,8 +123,10 @@ import { defineComponent } from '@vue/composition-api';
 import api from '../api';
 import { GameInfoData } from '../api/models';
 import { QAjaxBar } from 'quasar';
+import GameDetailCard from 'src/components/GameDetailCard.vue';
 
 export default defineComponent({
+  components: { GameDetailCard },
   props: {},
   data: function () {
     return {
@@ -266,6 +223,36 @@ export default defineComponent({
         }
       }
     },
+    removeGame: async function () {
+      const account = this.gameAccount;
+      if (!!account) {
+        await new Promise((resolve, reject) => {
+          this.$q
+            .dialog({
+              title: '删除确认',
+              message: `你确认要移除帐号${account}嘛?`,
+              cancel: true,
+              persistent: true,
+            })
+            .onOk(resolve)
+            .onCancel(reject);
+        });
+        try {
+          this.$q.loading.show();
+          await api.delGame(account);
+          this.$q.notify({
+            type: 'positive',
+            position: 'center',
+            progress: true,
+            message: `帐号${account}已被删除`,
+            closeBtn: '返回首页',
+            onDismiss: () => void this.$router.push('/'),
+          });
+        } finally {
+          this.$q.loading.hide();
+        }
+      }
+    },
     resourceURL: function (name: string, suffix?: string): string {
       suffix = suffix || 'png';
       return `https://ak.nai-ve.com/res/${name}.${suffix}`;
@@ -276,6 +263,7 @@ export default defineComponent({
     setInterval(() => void this.getGameAccounData(), 20 * 500);
   },
   beforeRouteUpdate: function (to, from, next) {
+    this.account = null;
     void this.getGameAccounData();
     next();
   },
