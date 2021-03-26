@@ -33,7 +33,7 @@
         size="lg"
         color="primary"
         type="submit"
-        @click="login_callback"
+        @click="login"
         :disable="!completed"
       />
       <q-btn
@@ -41,7 +41,7 @@
         size="lg"
         color="secondary"
         type="submit"
-        @click="register_callback"
+        @click="register"
         :disable="!completed"
       />
     </q-card-actions>
@@ -49,7 +49,6 @@
 </template>
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import { LoginFunc } from './models';
 
 export default defineComponent({
   name: 'LoginForm',
@@ -61,22 +60,17 @@ export default defineComponent({
     };
   },
   methods: {
-    login_callback: function () {
-      var login = this.$props.login as LoginFunc;
-      this.$q.loading.show();
-      login(this.username, this.password).finally(() => {
-        this.$q.loading.hide();
-      });
-    },
-    register_callback: function () {
-      var register = this.$props.register as LoginFunc;
-      this.$q.loading.show();
-      register(this.username, this.password).finally(() => {
-        this.$q.loading.hide();
-      });
-    },
     isBlank: function (value: string) {
       return !!value || '此项目为必填项目';
+    },
+    login: function () {
+      this.$emit('login', { username: this.username, password: this.password });
+    },
+    register: function () {
+      this.$emit('register', {
+        username: this.username,
+        password: this.password,
+      });
     },
   },
   computed: {
@@ -84,18 +78,8 @@ export default defineComponent({
       return !!this.username && !!this.password;
     },
   },
-  props: {
-    login: {
-      type: Function,
-      required: true,
-    },
-    register: {
-      type: Function,
-      required: true,
-    },
-  },
-  setup(props) {
-    return { ...props };
+  setup() {
+    return {};
   },
 });
 </script>

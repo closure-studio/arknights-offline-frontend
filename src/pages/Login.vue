@@ -8,61 +8,47 @@
     >
     <login-form
       class="col-12 col-md-4"
-      :login="login"
-      :register="register"
+      @login="login"
+      @register="register"
     ></login-form>
   </q-page>
 </template>
 
 <script lang="ts">
-import { Todo, Meta } from 'components/models';
 import LoginForm from 'components/LoginForm.vue';
-import { defineComponent, ref } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 import api from '../api';
 
 export default defineComponent({
   name: 'UserLogin',
   components: { LoginForm },
   methods: {
-    login: async function (username: string, password: string) {
-      await this.$store.dispatch('login/loginAccount', { username, password });
-      await this.$router.push('/');
+    login: async function (value: { username: string; password: string }) {
+      try {
+        this.$q.loading.show();
+        await this.$store.dispatch('login/loginAccount', {
+          username: value.username,
+          password: value.password,
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
     },
-    register: async function (username: string, password: string) {
-      await api.userRegister(username, password);
-      await this.login(username, password);
+    register: async function (value: { username: string; password: string }) {
+      try {
+        this.$q.loading.show();
+        await api.userRegister(value.username, value.password);
+        await this.login(value);
+      } finally {
+        this.$q.loading.hide();
+      }
     },
   },
   data: () => {
     return { password: '', username: '' };
   },
   setup() {
-    const todos = ref<Todo[]>([
-      {
-        id: 1,
-        content: 'ct1',
-      },
-      {
-        id: 2,
-        content: 'ct2',
-      },
-      {
-        id: 3,
-        content: 'ct3',
-      },
-      {
-        id: 4,
-        content: 'ct4',
-      },
-      {
-        id: 5,
-        content: 'ct5',
-      },
-    ]);
-    const meta = ref<Meta>({
-      totalCount: 1200,
-    });
-    return { todos, meta };
+    return {};
   },
 });
 </script>
