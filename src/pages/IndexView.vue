@@ -24,61 +24,6 @@ export default defineComponent({
   data: function () {
     return {};
   },
-  methods: {
-    makeWebsocketConnection: function () {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const store: Store<StateInterface> = this.$store;
-      const token = store.state.login.account?.token;
-      if (!token) {
-        void this.$router.push('/login');
-        return;
-      }
-      const host = new URL(this.$axios.defaults.baseURL as string).host;
-      const ws = new WebSocket(`wss://${host}/ws/?token=${token}`);
-
-      ws.onopen = (event) => {
-        store.commit('activity/connect');
-        console.timeLog('WebSocket connection opened', event);
-        this.$q.notify({
-          color: 'positive',
-          position: 'top',
-          message: 'WebSocket链接已建立',
-        });
-      };
-      ws.onmessage = (event) => {
-        const received: Map<string, string> = new Map(
-          Object.entries(JSON.parse(event.data as string))
-        );
-        received.forEach((message, account, map) => {
-          store.commit('activity/create', { account, message });
-        });
-      };
-      ws.onclose = ws.onerror = (event) => {
-        this.$q.notify({
-          message: 'WebSocket链接已断开',
-          color: 'negative',
-          position: 'top',
-        });
-      };
-    },
-    wsActivityListener: function (account: string, message: string) {
-      this.$q.notify({
-        type: 'info',
-        color: 'black',
-        position: 'bottom-left',
-        progress: true,
-        closeBtn: true,
-        message: message,
-        caption: `帐号 ${account}`,
-      });
-    },
-  },
-  mounted: function () {
-    this.$store.commit('activity/listen', (account: string, message: string) =>
-      this.wsActivityListener(account, message)
-    );
-    void this.makeWebsocketConnection();
-  },
   computed: {
     activitiesList: function () {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

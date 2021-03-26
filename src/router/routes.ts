@@ -6,7 +6,7 @@ const routes: RouteConfig[] = [
     component: () => import('layouts/AltLayout.vue'),
     children: [
       { path: '', component: () => import('pages/IndexView.vue') },
-      { path: '/login', component: () => import('pages/Login.vue') },
+      { path: '/login', component: () => import('pages/LoginView.vue') },
       { path: '/game/:account?', component: () => import('pages/GameView.vue') }
     ]
   },
