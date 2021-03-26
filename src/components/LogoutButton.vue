@@ -4,6 +4,7 @@
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
 import { AccountObject } from '../store/login';
+import utils from '../utils';
 
 export default defineComponent({
   methods: {
@@ -23,7 +24,7 @@ export default defineComponent({
           type: 'negative',
           message: '您已退出登录',
           closeBtn: '返回登录页面',
-          onDismiss: () => void this.$router.push('/login'),
+          onDismiss: () => void utils.redirect(this.$router, '/login'),
         });
       } else {
         this.$q.notify({
@@ -31,10 +32,9 @@ export default defineComponent({
           message: '帐号登录成功',
           caption: `用户名: ${account.username}`,
           closeBtn: '前往首页',
-          onDismiss: () => void this.$router.push('/'),
+          onDismiss: () => void utils.redirect(this.$router, '/'),
         });
       }
-      this.$router.currentRoute.path;
     },
   },
   mounted: function () {

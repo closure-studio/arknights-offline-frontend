@@ -78,11 +78,6 @@ export default defineComponent({
   },
   methods: {
     refreshAccountData: async function () {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const store: Store<StateInterface> = this.$store;
-      if (!store.state.login.account) {
-        return void this.$router.push('/login');
-      }
       try {
         this.loading = true;
         const result = await api.getGamesAccounts();

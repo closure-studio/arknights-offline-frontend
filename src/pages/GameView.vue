@@ -140,6 +140,7 @@ import api from '../api';
 import { GameInfoData } from '../api/models';
 import { QAjaxBar } from 'quasar';
 import GameDetailCard from 'src/components/GameDetailCard.vue';
+import utils from '../utils';
 
 export default defineComponent({
   components: { GameDetailCard },
@@ -262,17 +263,15 @@ export default defineComponent({
             progress: true,
             message: `帐号${account}已被删除`,
             closeBtn: '返回首页',
-            onDismiss: () => void this.$router.push('/'),
+            onDismiss: () => void utils.redirect(this.$router, '/'),
           });
         } finally {
           this.$q.loading.hide();
         }
       }
     },
-    resourceURL: function (name: string, suffix?: string): string {
-      suffix = suffix || 'png';
-      return `https://ak.nai-ve.com/res/${name}.${suffix}`;
-    },
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    resourceURL: utils.resource,
   },
   mounted: function () {
     void this.getGameAccounData();
