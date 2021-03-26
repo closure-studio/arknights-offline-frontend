@@ -3,9 +3,16 @@
     <q-header elevated class="bg-primary text-white" height-hint="98">
       <q-toolbar>
         <q-toolbar-title> 明日方舟离线托管 </q-toolbar-title>
-        <dark-mode-button />
+        <q-space />
+        <q-separator vertical />
         <logout-button />
+        <q-separator vertical />
         <q-btn dense flat round icon="menu" @click="right = !right" />
+      </q-toolbar>
+      <q-toolbar inset>
+        <q-space />
+        <web-socket-status />
+        <dark-mode-button />
       </q-toolbar>
 
       <q-tabs align="left">
@@ -29,9 +36,10 @@
 import SideBar from 'components/SideBar.vue';
 import DarkModeButton from 'components/DarkModeButton.vue';
 import LogoutButton from 'components/LogoutButton.vue';
+import WebSocketStatus from 'src/components/WebSocketStatus.vue';
 
 export default {
-  components: { SideBar, DarkModeButton, LogoutButton },
+  components: { SideBar, DarkModeButton, LogoutButton, WebSocketStatus },
   data() {
     return {
       right: false,
