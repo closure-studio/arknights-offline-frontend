@@ -1,4 +1,4 @@
-import { QVueGlobals, DialogChainObject } from 'quasar';
+import { QVueGlobals, QDialogOptions } from 'quasar';
 import VueRouter from 'vue-router';
 
 export default {
@@ -7,7 +7,7 @@ export default {
       setTimeout(resolve, ms);
     });
   },
-  async dialog(quasar: QVueGlobals, options: DialogChainObject) {
+  async dialog(quasar: QVueGlobals, options: QDialogOptions) {
     return await new Promise((resolve, reject) => {
       quasar
         .dialog(options)

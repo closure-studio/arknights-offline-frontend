@@ -34,13 +34,13 @@
               " /></q-item-section
           ><q-item-section
             ><q-item-label>{{ account.account }}</q-item-label>
-            <q-item-label caption>
-              {{ account.platform ? 'Android' : 'iOS' }}
-            </q-item-label></q-item-section
+            <q-item-section caption class="text-grey">
+              {{ accountStatus.get(account.account) || '状态未知' }}
+            </q-item-section></q-item-section
           >
-          <q-item-section side top>
-            {{ accountStatus.get(account.account) || '状态未知' }}
-          </q-item-section>
+          <q-item-label side top class="text-grey">
+            {{ account.platform ? 'Android' : 'iOS' }}
+          </q-item-label>
         </q-item>
       </q-list>
 
@@ -65,6 +65,8 @@ import api from '../api';
 import { GameAccountData } from '../api/models';
 import { Store } from 'vuex';
 import { StateInterface } from '../store';
+import GameAccountForm from './GameAccountForm.vue';
+import utils from '../utils';
 
 export default defineComponent({
   props: {},
@@ -97,53 +99,11 @@ export default defineComponent({
       }
     },
     newAccount: async function () {
-      const account: string = await new Promise((resolve, reject) =>
-        this.$q
-          .dialog({
-            title: '录入帐号信息',
-            message: '请输入游戏帐号',
-            cancel: true,
-            persistent: true,
-            prompt: {
-              model: '',
-              type: 'text',
-              counter: true,
-              isValid: Boolean,
-            },
-          })
-          .onOk((data: string) => resolve(data))
-          .onCancel(reject)
-      );
-      const password: string = await new Promise((resolve, reject) =>
-        this.$q
-          .dialog({
-            title: '录入帐号信息',
-            message: `请输入帐号${account}的密码`,
-            cancel: true,
-            persistent: true,
-            prompt: {
-              model: '',
-              type: 'password',
-              counter: true,
-              isValid: Boolean,
-            },
-          })
-          .onOk((data: string) => resolve(data))
-          .onCancel(reject)
-      );
-      try {
-        this.$q.loading.show();
-        await api.createGame(account, password);
-        this.$q.notify({
-          type: 'positive',
-          message: '托管已成功添加',
-          caption: `帐号: ${account}`,
-          position: 'top',
-          progress: true,
-        });
-      } finally {
-        this.$q.loading.hide();
-      }
+      const data = (await utils.dialog(this.$q, {
+        component: GameAccountForm,
+        parent: this,
+      })) as { account: string; password: string };
+      void utils.dialog(this.$q, { message: String(data) });
     },
   },
   mounted: function () {

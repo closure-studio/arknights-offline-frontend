@@ -70,10 +70,11 @@ class ApiConnection {
       '/user/getGamesAccounts'
     )) as GeneralResponse<GameAccountData[]>;
   }
-  static async createGame(account: string, password: string) {
+  static async createGame(account: string, password: string, platform: 0 | 1) {
     return (await this._processRequest('/user/createGame', {
       account,
-      password
+      password,
+      platform
     })) as GeneralResponse<GameAccountData[]>;
   }
   static async delGame(account: string) {
