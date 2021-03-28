@@ -47,6 +47,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
+import utils from 'src/utils';
 import { GameInfoData } from '../api/models';
 
 export default defineComponent({
@@ -61,10 +62,8 @@ export default defineComponent({
     },
   },
   methods: {
-    resourceURL: function (name: string, suffix?: string): string {
-      suffix = suffix || 'png';
-      return `https://ak.nai-ve.com/res/${name}.${suffix}`;
-    },
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    resourceURL: utils.resource,
   },
   setup(props) {
     return { ...props };

@@ -23,6 +23,6 @@ export default {
   },
   resource(name: string, ext?: string): string {
     ext = ext || 'png';
-    return `https://ak.nai-ve.com/res/${name}.${ext}`;
+    return `https://akres.nai-ve.com/${name}.${ext}`;
   }
 };
