@@ -11,12 +11,16 @@ axios.defaults.baseURL = 'https://akapi.nai-ve.com';
 axios.defaults.timeout = 6000;
 
 axios.interceptors.request.use(request => {
-  console.debug('Request sent:' + JSON.stringify(request));
+  if (process.env.DEBUGGING) {
+    console.debug('Request sent:' + JSON.stringify(request));
+  }
   return request;
 });
 
 axios.interceptors.response.use(response => {
-  console.debug('Response received:' + JSON.stringify(response));
+  if (process.env.DEBUGGING) {
+    console.debug('Response received:' + JSON.stringify(response));
+  }
   return response;
 });
 
