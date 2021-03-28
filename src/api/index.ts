@@ -3,7 +3,8 @@ import {
   GeneralResponse,
   UserInfoData,
   GameAccountData,
-  GameInfoData
+  GameInfoData,
+  SystemInfoData
 } from './models';
 import { AxiosError } from 'axios';
 import Vue from 'vue';
@@ -102,6 +103,11 @@ class ApiConnection {
     return (await this._processRequest('/game/setGameResume', {
       account
     })) as GeneralResponse<[]>;
+  }
+  static async getSystemInfo() {
+    return (await this._processRequest(
+      '/system/getSystemInfo'
+    )) as GeneralResponse<SystemInfoData>;
   }
 }
 
