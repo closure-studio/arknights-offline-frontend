@@ -12,7 +12,7 @@
     </div>
 
     <q-card
-      v-else-if="!(account.PlayerStatus && account.inventory)"
+      v-else-if="!(account.PlayerStatus && account.Inventory)"
       class="text-center col-6 shadow-1"
     >
       <q-card-section>
@@ -76,17 +76,17 @@
             >
             <div>
               下一次运行:
-              <q-badge>{{ account.systemInfo.nextAutoRunTime }}</q-badge>
+              <q-badge>{{ account.GameConfig.nextAutoRunTime }}</q-badge>
             </div>
           </q-card-actions>
         </q-tab-panel>
         <q-tab-panel name="inventory">
           <div class="text-h6">库存</div>
-          共 {{ account.inventory.length }} 种物品
+          共 {{ account.Inventory.length }} 种物品
           <q-separator />
           <q-intersection transition="fade">
             <q-chip
-              v-for="item in account.inventory"
+              v-for="item in account.Inventory"
               :key="item.Id"
               size="xl"
               class="shadow-1"
@@ -108,14 +108,14 @@
           <div class="text-h6">日志</div>
           <q-pagination
             v-model="current"
-            :max="Math.ceil(account.log.length / 5) + 1"
+            :max="Math.ceil(account.Log.length / 5) + 1"
             input
           />
           <q-intersection transition="fade">
             <q-timeline color="accent" layout="comfortable">
               <q-timeline-entry
                 icon="timeline"
-                v-for="log in account.log.slice(5 * (current - 1), 5 * current)"
+                v-for="log in account.Log.slice(5 * (current - 1), 5 * current)"
                 :title="log.text"
                 :subtitle="log.logtime"
                 :key="log.id"
@@ -181,7 +181,7 @@ export default defineComponent({
   watch: {
     account(elder: GameInfoData | undefined, newer: GameInfoData | undefined) {
       if (!!newer) {
-        this.paused = newer.systemInfo.isPause;
+        this.paused = newer.GameConfig.isPause;
       }
     },
   },

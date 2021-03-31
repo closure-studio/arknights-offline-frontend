@@ -22,7 +22,7 @@ export default {
     }
   },
   resource(name: string, ext?: string): string {
-    ext = ext || 'png';
+    ext = ext || 'webp';
     return `https://akres.nai-ve.com/${name}.${ext}`;
   }
 };

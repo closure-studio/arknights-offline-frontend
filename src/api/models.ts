@@ -17,13 +17,12 @@ export interface GameAccountData {
   account: string;
 }
 export interface GameInfoData {
-  systemInfo: {
-    isPause: boolean;
-    nextAutoRunTime: string;
-  };
-  PlayerStatus?: {
+  PlayerStatus: {
     LongMenBi: number;
-    YuanShi: { Android: number; iOS: number };
+    YuanShi: {
+      Android: number;
+      iOS: number;
+    };
     UserName: string;
     Level: number;
     Exp: number;
@@ -33,17 +32,43 @@ export interface GameInfoData {
     XunFangTicket: number;
     ShiLianTicket: number;
     GongZhaoJuan: number;
-    LizhiHuiFu: number[];
+    LizhiHuiFu: [number, number];
     TouXiang: string;
-    YueKa: { Has: boolean; Start: number; End: number };
-    Mishu: { Mishu: string; Skin: string };
+    YueKa: {
+      Has: boolean;
+      Start: number;
+      End: number;
+    };
+    Mishu: {
+      Mishu: string;
+      Skin: string;
+    };
   };
-  inventory?: { Id: string; Quantity: number; CNName: string }[];
-  log: {
+  Inventory: {
+    Id: string;
+    Quantity: number;
+    CNName: string;
+  }[];
+  Squads: {
+    [key: string]: {
+      squadId: string;
+      name: string;
+      slots: ({
+        charInstId: number;
+        skillIndex: number;
+        name: string;
+      } | null)[];
+    };
+  };
+  Log: {
     id: number;
     account: string;
     logtime: string;
     text: string;
     level: number;
   }[];
+  GameConfig: {
+    isPause: boolean;
+    nextAutoRunTime: string;
+  };
 }
