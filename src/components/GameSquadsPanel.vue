@@ -1,7 +1,7 @@
 <template>
   <q-card>
     <q-card-section>
-      <q-tabs v-model="tab" class="text-accent">
+      <q-tabs v-model="tab">
         <q-tab
           v-for="key in Object.keys(squads)"
           :name="key"
@@ -45,6 +45,10 @@ export default defineComponent({
     data: {
       required: true,
     },
+    value: {
+      type: String,
+      required: false,
+    },
   },
   setup(props) {
     return { ...props };
@@ -61,6 +65,11 @@ export default defineComponent({
   methods: {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     resourceURL: utils.resource,
+  },
+  watch: {
+    tab: function () {
+      this.$emit('input', this.tab);
+    },
   },
 });
 </script>

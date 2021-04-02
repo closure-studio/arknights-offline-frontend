@@ -107,26 +107,31 @@
 
         <q-tab-panel name="squads">
           <div class="text-h6">编队</div>
-          <game-squads-panel :data="account" />
+          <q-expansion-item
+            icon="people"
+            label="战斗编队"
+            :caption="`目前已选择: ${
+              Object.keys(account.Squads).includes(squad)
+                ? account.Squads[squad].name
+                : undefined
+            }`"
+          >
+            <game-squads-panel :data="account" v-model="squad"
+          /></q-expansion-item>
+          <q-card-actions align="evenly"
+            ><q-chip icon="gamepad" square
+              >自动战斗:<q-toggle color="accent"
+            /></q-chip>
+            <q-chip icon="badge" square
+              >自动公招:<q-toggle color="accent"
+            /></q-chip>
+            <q-btn flat color="positive" icon="done">应用设置</q-btn>
+          </q-card-actions>
         </q-tab-panel>
 
         <q-tab-panel name="log">
           <div class="text-h6">日志</div>
-          <q-pagination
-            v-model="current"
-            :max="Math.ceil(account.Log.length / 5) + 1"
-            input
-          />
-          <q-intersection transition="fade">
-            <q-timeline color="accent" layout="comfortable">
-              <q-timeline-entry
-                icon="timeline"
-                v-for="log in account.Log.slice(5 * (current - 1), 5 * current)"
-                :title="log.text"
-                :subtitle="log.logtime"
-                :key="log.id"
-              ></q-timeline-entry> </q-timeline
-          ></q-intersection>
+          <game-log-timeline :data="account" />
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
@@ -148,16 +153,17 @@ import { QAjaxBar } from 'quasar';
 import GameDetailCard from 'src/components/GameDetailCard.vue';
 import utils from '../utils';
 import GameSquadsPanel from 'src/components/GameSquadsPanel.vue';
+import GameLogTimeline from 'src/components/GameLogTimeline.vue';
 
 export default defineComponent({
-  components: { GameDetailCard, GameSquadsPanel },
+  components: { GameDetailCard, GameSquadsPanel, GameLogTimeline },
   props: {},
   data: function () {
     return {
       account: null as GameInfoData | null,
       tab: 'info',
       paused: false,
-      current: 1,
+      squad: '',
     };
   },
   computed: {
