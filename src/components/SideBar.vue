@@ -7,7 +7,11 @@
       <q-list bordered separator class="shadow-1" v-if="userData">
         <q-item>
           <q-item-section avatar>
-            <q-avatar color="accent" text-color="white">
+            <q-avatar
+              color="accent"
+              text-color="white"
+              v-if="userData.username"
+            >
               {{ userData.username[0].toUpperCase() }}
             </q-avatar></q-item-section
           >

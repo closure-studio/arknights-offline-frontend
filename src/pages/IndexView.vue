@@ -33,8 +33,8 @@ export default defineComponent({
         account: string;
         message: string;
       }>;
-      store.state.activity.activities.forEach((activity, account, map) => {
-        activity.forEach((message, time, map) => {
+      store.state.activity.activities.forEach((activity, account) => {
+        activity.forEach((message, time) => {
           list.push({
             time,
             message,
