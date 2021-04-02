@@ -8,7 +8,7 @@ import { defineComponent } from '@vue/composition-api';
 
 export default defineComponent({
   name: 'App',
-  mounted: function () {
+  beforeMount: function () {
     try {
       this.$store.commit('login/login');
     } catch (err) {

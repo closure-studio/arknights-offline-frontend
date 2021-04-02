@@ -49,6 +49,7 @@
       >
         <q-tab name="info" label="信息" />
         <q-tab name="inventory" label="库存" />
+        <q-tab name="squads" label="编队" />
         <q-tab name="log" label="日志" />
       </q-tabs>
 
@@ -104,6 +105,11 @@
           </q-intersection>
         </q-tab-panel>
 
+        <q-tab-panel name="squads">
+          <div class="text-h6">编队</div>
+          <game-squads-panel :data="account" />
+        </q-tab-panel>
+
         <q-tab-panel name="log">
           <div class="text-h6">日志</div>
           <q-pagination
@@ -141,9 +147,10 @@ import { GameInfoData } from '../api/models';
 import { QAjaxBar } from 'quasar';
 import GameDetailCard from 'src/components/GameDetailCard.vue';
 import utils from '../utils';
+import GameSquadsPanel from 'src/components/GameSquadsPanel.vue';
 
 export default defineComponent({
-  components: { GameDetailCard },
+  components: { GameDetailCard, GameSquadsPanel },
   props: {},
   data: function () {
     return {
