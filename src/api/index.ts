@@ -4,7 +4,9 @@ import {
   UserInfoData,
   GameAccountData,
   GameInfoData,
-  SystemInfoData
+  SystemInfoData,
+  GameConfigData,
+  GameMapData
 } from './models';
 import { AxiosError } from 'axios';
 import Vue from 'vue';
@@ -104,10 +106,32 @@ class ApiConnection {
       account
     })) as GeneralResponse<[]>;
   }
+  static async setAutoBattle(
+    account: string,
+    autoBattle: boolean,
+    autoRecruit: boolean,
+    squadSelected: number,
+    mapId: string,
+    modelName: string
+  ) {
+    return (await this._processRequest('/game/setAutoBattle', {
+      account,
+      autoBattle,
+      autoRecruit,
+      squadSelected,
+      mapId,
+      modelName
+    })) as GeneralResponse<GameConfigData>;
+  }
   static async getSystemInfo() {
     return (await this._processRequest(
       '/system/getSystemInfo'
     )) as GeneralResponse<SystemInfoData>;
+  }
+  static async getAllModels() {
+    return (await this._processRequest(
+      '/system/getAllModels'
+    )) as GeneralResponse<GameMapData[]>;
   }
 }
 
