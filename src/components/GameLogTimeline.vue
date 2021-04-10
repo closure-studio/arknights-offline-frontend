@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <q-pagination v-model="page" :max="total" boundary-numbers />
+  <div class="column justify-evenly items-center">
+    <q-pagination v-model="page" :max="total" boundary-numbers input />
     <v-separator />
     <q-timeline color="accent" layout="comfortable">
       <q-timeline-entry
