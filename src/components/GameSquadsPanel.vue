@@ -1,13 +1,16 @@
 <template>
   <q-card>
     <q-card-section>
-      <q-tabs v-model="tab">
+      <q-tabs v-model="tab" dense @input="$emit('input', tab)">
         <q-tab
           v-for="key in Object.keys(squads)"
           :name="key"
           :key="key"
           :label="squads[key].name"
-        ></q-tab>
+          ><q-badge v-if="key === $props.highlitght" floating color="accent"
+            >当前</q-badge
+          ></q-tab
+        >
       </q-tabs>
     </q-card-section>
     <q-separator />
@@ -19,7 +22,7 @@
         v-for="member in Object.keys(squads).includes(tab)
           ? squads[tab].slots.filter((value) => !!value)
           : []"
-        :key="member"
+        :key="member ? member.name : 0"
       >
         <q-img
           class="shadow-1"
@@ -49,6 +52,10 @@ export default defineComponent({
       type: String,
       required: false,
     },
+    highlitght: {
+      type: String,
+      required: false,
+    },
   },
   setup(props) {
     return { ...props };
@@ -65,11 +72,6 @@ export default defineComponent({
   methods: {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     resourceURL: utils.resource,
-  },
-  watch: {
-    tab: function () {
-      this.$emit('input', this.tab);
-    },
   },
 });
 </script>
