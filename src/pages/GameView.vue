@@ -61,18 +61,19 @@
           <q-card-section><game-detail-card :data="account" /></q-card-section>
 
           <q-card-actions align="evenly">
-            <q-btn icon="vpn_key" @click="loginGame" flat color="positive"
-              >立即登录该帐号</q-btn
-            >
-            <q-btn icon="clear" @click="removeGame" flat color="negative"
-              >删除该帐号</q-btn
-            >
+            <q-btn icon="vpn_key" @click="loginGame" flat color="positive">
+              立即登录该帐号
+            </q-btn>
+            <q-btn icon="clear" @click="removeGame" flat color="negative">
+              删除该帐号
+            </q-btn>
             <div>
               下一次运行:
               <q-badge>{{ account.GameConfig.nextAutoRunTime }}</q-badge>
             </div>
           </q-card-actions>
         </q-tab-panel>
+
         <q-tab-panel name="inventory">
           <div class="text-h6">库存</div>
           共 {{ account.Inventory.length }} 种物品
@@ -85,15 +86,15 @@
               class="shadow-1"
             >
               <q-avatar square size="xl">
-                <q-img :src="resourceURL(item.Id)" ratio="1"></q-img
-              ></q-avatar>
+                <q-img :src="resourceURL(item.Id)" ratio="1"></q-img>
+              </q-avatar>
               <div>
-                {{ item.CNName
-                }}<q-badge align="middle" outline color="primary">{{
-                  item.Quantity
-                }}</q-badge>
-              </div></q-chip
-            >
+                {{ item.CNName }}
+                <q-badge align="middle" outline color="primary"
+                  >{{ item.Quantity }}
+                </q-badge>
+              </div>
+            </q-chip>
           </q-intersection>
         </q-tab-panel>
 

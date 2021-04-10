@@ -70,8 +70,11 @@ export interface GameInfoData {
   GameConfig: {
     isPause: boolean;
     nextAutoRunTime: string;
-    autoBattle: boolean;
+    isAutoBattle: boolean;
     squadSelected: number;
+    mapId: string;
+    modelName: string;
+    reserveAP: number;
     autoRecruit: boolean;
   };
 }

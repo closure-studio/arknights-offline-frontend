@@ -2,7 +2,7 @@
   <div>
     <q-slide-transition>
       <div v-show="modified">
-        <q-banner rounded class="bg-primary text-white"
+        <q-banner rounded class="bg-warning text-white"
           >设置已经修改,但尚未保存</q-banner
         >
       </div>
@@ -10,7 +10,7 @@
 
     <q-expansion-item
       label="战斗编队"
-      :caption="`当前选择: ${selectedSquad}`"
+      :caption="`当前选择: ${getSquadName(selectedSquad)}`"
       class="q-pa-md"
       expand-separator
       icon="group"
@@ -24,22 +24,29 @@
 
     <q-form @change="modified++">
       <div class="row justify-evenly items-center">
-        <q-chip icon="pause" square
-          >暂停刷图: <q-toggle v-model="paused" color="yellow"
-        /></q-chip>
-        <q-chip icon="gamepad" square
-          >自动战斗: <q-toggle color="positive" v-model="battle"
-        /></q-chip>
-        <q-chip icon="badge" square
-          >自动公招: <q-toggle color="accent" v-model="recurit"
-        /></q-chip>
+        <q-chip icon="pause" square>
+          暂停刷图:
+          <q-toggle v-model="paused" color="yellow" @input="applyPauseChange" />
+        </q-chip>
+
+        <q-chip icon="gamepad" square>
+          自动战斗:
+          <q-toggle color="positive" v-model="battle" @input="modified++" />
+        </q-chip>
+
+        <q-chip icon="badge" square>
+          自动公招:
+          <q-toggle color="accent" v-model="recurit" @input="modified++" />
+        </q-chip>
+
         <q-select
+          clearable
+          v-model="selectedMap"
           label="作战地图"
           class="col-6"
           @filter="availableMaps"
-          :options="maps"
-          v-model="selectedMap"
-          clearable
+          @input="modified++"
+          :options="maps ? Array.from(maps.values()) : null"
         >
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
@@ -59,7 +66,7 @@
           icon="done"
           type="submit"
           @click="submitConfigChange"
-          :disable="!!modified"
+          :disable="!modified"
           >应用设置</q-btn
         >
       </div>
@@ -77,19 +84,15 @@ export default defineComponent({
   data: () => {
     return {
       modified: 0,
-      maps: null as
-        | null
-        | {
-            label: string;
-
-            value: { map: string; model: string };
-            description: string;
-          }[],
+      maps: null as null | Map<
+        string,
+        { label: string; value: string; description: string; model: string }
+      >,
       selectedSquad: '',
       paused: false,
       battle: false,
       recurit: false,
-      selectedMap: null as null | { map: string; model: string },
+      selectedMap: null as null | string,
     };
   },
   props: {
@@ -119,13 +122,15 @@ export default defineComponent({
       } else {
         try {
           const result = await api.getAllModels();
-          this.maps = result.data.map((data) => {
-            return {
+          this.maps = new Map();
+          result.data.forEach((data) =>
+            this.maps?.set(data.mapId, {
               label: data.mapId,
-              value: { map: data.mapId, model: data.modelName },
+              value: data.mapId,
+              model: data.modelName,
               description: data.description,
-            };
-          });
+            })
+          );
         } catch {
           abort();
         }
@@ -143,8 +148,8 @@ export default defineComponent({
           this.battle,
           this.recurit,
           Number(this.selectedSquad),
-          this.selectedMap?.map,
-          this.selectedMap?.model
+          this.selectedMap,
+          String(this.maps?.get(this.selectedMap)?.model)
         );
         this.$q.notify({
           message: '游戏设定修改成功',
@@ -156,6 +161,32 @@ export default defineComponent({
       } finally {
         this.$q.loading.hide();
       }
+      this.modified = 0;
+    },
+    async applyPauseChange(value: boolean) {
+      try {
+        this.$q.loading.show();
+        if (value) {
+          await api.setGamePause(this.$props.account);
+        } else {
+          await api.setGameResume(this.$props.account);
+        }
+        this.$q.notify({
+          message: '暂停状态修改成功',
+          caption: `已经修改为 ${String(value)}`,
+          type: 'positive',
+          position: 'bottom',
+          progress: true,
+        });
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
+    getSquadName(id: string): string | undefined {
+      const data = this.$props.data as GameInfoData;
+      return Object.keys(data.Squads).includes(id)
+        ? data.Squads[id].name
+        : undefined;
     },
   },
   watch: {
@@ -164,9 +195,12 @@ export default defineComponent({
         if (this.modified) {
           return;
         }
+
+        this.selectedSquad = String(this.config.squadSelected);
         this.paused = this.config.isPause;
-        this.battle = this.config.autoBattle;
+        this.battle = this.config.isAutoBattle;
         this.recurit = this.config.autoRecruit;
+        this.selectedMap = this.config.mapId;
       },
       deep: true,
       immediate: true,
