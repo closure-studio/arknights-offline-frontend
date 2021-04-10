@@ -40,17 +40,16 @@
       </q-card-section>
       <q-tabs
         v-model="tab"
-        dense
-        class="text-grey"
         active-color="primary"
         indicator-color="primary"
         align="justify"
         narrow-indicator
+        @change="$forceUpdate"
       >
-        <q-tab name="info" label="信息" />
-        <q-tab name="inventory" label="库存" />
-        <q-tab name="squads" label="编队" />
-        <q-tab name="log" label="日志" />
+        <q-tab name="info" label="信息" icon="info" />
+        <q-tab name="inventory" label="库存" icon="inventory" />
+        <q-tab name="settings" label="设定" icon="settings" />
+        <q-tab name="log" label="日志" icon="article" />
       </q-tabs>
 
       <q-separator />
@@ -59,16 +58,9 @@
         <q-tab-panel name="info">
           <div class="text-h6">信息</div>
           <q-separator />
-          <q-card-section> <game-detail-card :data="account" /></q-card-section>
+          <q-card-section><game-detail-card :data="account" /></q-card-section>
 
           <q-card-actions align="evenly">
-            <div>
-              暂停中:<q-toggle
-                v-model="paused"
-                color="accent"
-                @input="pauseToggle"
-              ></q-toggle>
-            </div>
             <q-btn icon="vpn_key" @click="loginGame" flat color="positive"
               >立即登录该帐号</q-btn
             >
@@ -105,28 +97,10 @@
           </q-intersection>
         </q-tab-panel>
 
-        <q-tab-panel name="squads">
-          <div class="text-h6">编队</div>
-          <q-expansion-item
-            icon="people"
-            label="战斗编队"
-            :caption="`目前已选择: ${
-              Object.keys(account.Squads).includes(squad)
-                ? account.Squads[squad].name
-                : undefined
-            }`"
-          >
-            <game-squads-panel :data="account" v-model="squad"
-          /></q-expansion-item>
-          <q-card-actions align="evenly"
-            ><q-chip icon="gamepad" square
-              >自动战斗:<q-toggle color="accent"
-            /></q-chip>
-            <q-chip icon="badge" square
-              >自动公招:<q-toggle color="accent"
-            /></q-chip>
-            <q-btn flat color="positive" icon="done">应用设置</q-btn>
-          </q-card-actions>
+        <q-tab-panel name="settings">
+          <div class="text-h6">设定</div>
+          <q-separator />
+          <game-config-controls :data="account" :account="gameAccount" />
         </q-tab-panel>
 
         <q-tab-panel name="log">
@@ -152,18 +126,21 @@ import { GameInfoData } from '../api/models';
 import { QAjaxBar } from 'quasar';
 import GameDetailCard from 'src/components/GameDetailCard.vue';
 import utils from '../utils';
-import GameSquadsPanel from 'src/components/GameSquadsPanel.vue';
 import GameLogTimeline from 'src/components/GameLogTimeline.vue';
+import GameConfigControls from 'src/components/GameConfigControls.vue';
 
 export default defineComponent({
-  components: { GameDetailCard, GameSquadsPanel, GameLogTimeline },
+  components: {
+    GameDetailCard,
+
+    GameLogTimeline,
+    GameConfigControls,
+  },
   props: {},
   data: function () {
     return {
       account: null as GameInfoData | null,
       tab: 'info',
-      paused: false,
-      squad: '',
     };
   },
   computed: {
@@ -189,13 +166,6 @@ export default defineComponent({
     },
     loadingBar: function (): QAjaxBar {
       return this.$refs.bar as QAjaxBar;
-    },
-  },
-  watch: {
-    account(elder: GameInfoData | undefined, newer: GameInfoData | undefined) {
-      if (!!newer) {
-        this.paused = newer.GameConfig.isPause;
-      }
     },
   },
   methods: {
@@ -256,16 +226,11 @@ export default defineComponent({
     removeGame: async function () {
       const account = this.gameAccount;
       if (!!account) {
-        await new Promise((resolve, reject) => {
-          this.$q
-            .dialog({
-              title: '删除确认',
-              message: `你确认要移除帐号${account}嘛?`,
-              cancel: true,
-              persistent: true,
-            })
-            .onOk(resolve)
-            .onCancel(reject);
+        await utils.dialog(this.$q, {
+          title: '删除确认',
+          message: `你确认要移除帐号${account}嘛?`,
+          cancel: true,
+          persistent: true,
         });
         try {
           this.$q.loading.show();
