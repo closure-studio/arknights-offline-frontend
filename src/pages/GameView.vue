@@ -10,26 +10,28 @@
         >刷新数据</q-btn
       >
     </div>
-
+    <!--Game Login Prompt-->
     <q-card
       v-else-if="!(account.PlayerStatus && account.Inventory)"
-      class="text-center col-6 shadow-1"
+      class="col-6 shadow-1"
     >
       <q-card-section>
-        <div class="text-h4">请先登录该帐号</div>
-        <q-badge color="negative">{{ gameAccount }}</q-badge>
+        <div class="text-h5">请先登录该帐号</div>
         <div class="text-subtitle">如已登录, 请稍等</div>
+        <q-chip icon="person">帐号: {{ gameAccount }}</q-chip>
       </q-card-section>
       <q-separator spaced />
       <q-card-actions align="evenly">
-        <q-btn icon="vpn_key" @click="loginGame" flat color="positive"
-          >登录该帐号</q-btn
-        >
-        <q-btn icon="clear" @click="removeGame" flat color="negative"
-          >删除该帐号</q-btn
-        ></q-card-actions
-      >
+        <q-btn icon="vpn_key" @click="loginGame" flat color="positive">
+          登录该帐号
+        </q-btn>
+        <q-btn icon="clear" @click="removeGame" flat color="negative">
+          删除该帐号
+        </q-btn>
+        <q-btn icon="refresh" @click="getGameAccounData" flat> 刷新数据 </q-btn>
+      </q-card-actions>
     </q-card>
+    <!--Game Detail Card-->
     <q-card v-else bordered class="col-12 col-md-6">
       <q-card-section>
         <div class="text-h4">游戏状态</div>
@@ -170,29 +172,7 @@ export default defineComponent({
     },
   },
   methods: {
-    pauseToggle: async function (value: boolean) {
-      if (!this.gameAccount) {
-        return;
-      }
-      try {
-        this.$q.loading.show();
-        if (value) {
-          await api.setGamePause(this.gameAccount);
-        } else {
-          await api.setGameResume(this.gameAccount);
-        }
-      } finally {
-        this.$q.loading.hide();
-      }
-      this.$q.notify({
-        message: '暂停状态修改成功',
-        caption: `已经修改为 ${String(value)}`,
-        type: 'positive',
-        position: 'bottom',
-        progress: true,
-      });
-    },
-    getGameAccounData: async function () {
+    async getGameAccounData() {
       const account = this.gameAccount;
       if (!!account) {
         try {
@@ -208,7 +188,7 @@ export default defineComponent({
         this.account = null;
       }
     },
-    loginGame: async function () {
+    async loginGame() {
       const account = this.gameAccount;
       if (!!account) {
         try {
@@ -224,7 +204,7 @@ export default defineComponent({
         }
       }
     },
-    removeGame: async function () {
+    async removeGame() {
       const account = this.gameAccount;
       if (!!account) {
         await utils.dialog(this.$q, {

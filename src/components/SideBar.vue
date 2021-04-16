@@ -10,7 +10,7 @@
             <q-avatar
               color="accent"
               text-color="white"
-              v-if="userData.username"
+              v-if="!!userData.username"
             >
               {{ userData.username[0].toUpperCase() }}
             </q-avatar></q-item-section
@@ -113,6 +113,7 @@ export default defineComponent({
   mounted: function () {
     void this.refreshAccountData();
     setInterval(() => void this.refreshAccountData(), 10 * 1000);
+    setInterval(() => this.$forceUpdate(), 1000);
   },
   watch: {},
   computed: {

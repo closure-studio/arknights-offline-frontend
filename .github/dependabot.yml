@@ -1,0 +1,9 @@
+version: 2
+updates:
+  - package-ecosystem: "yarn"
+    directory: "/"
+    schedule:
+      # Check for updates managed by Composer once a week
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: "
