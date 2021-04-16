@@ -39,11 +39,20 @@
           <q-toggle color="accent" v-model="recurit" @input="modified++" />
         </q-chip>
 
+        <q-input
+          clearable
+          class="col-12 col-md-4"
+          label="保留理智"
+          type="number"
+          v-model.number="reserveAP"
+          @input="modified++"
+        />
+
         <q-select
           clearable
           v-model="selectedMap"
           label="作战地图"
-          class="col-6"
+          class="col-12 col-md-4"
           @filter="availableMaps"
           @input="modified++"
           :options="maps ? Array.from(maps.values()) : null"
@@ -60,7 +69,9 @@
             </q-item>
           </template>
         </q-select>
+
         <q-btn
+          class="col-12 q-pa-md"
           flat
           color="positive"
           icon="done"
@@ -93,6 +104,7 @@ export default defineComponent({
       battle: false,
       recurit: false,
       selectedMap: null as null | string,
+      reserveAP: 0,
     };
   },
   props: {
@@ -108,6 +120,10 @@ export default defineComponent({
     config() {
       const data = this.$props.data as GameInfoData;
       return data.GameConfig;
+    },
+    info() {
+      const data = this.$props.data as GameInfoData;
+      return data.PlayerStatus;
     },
   },
   methods: {
@@ -149,7 +165,8 @@ export default defineComponent({
           this.recurit,
           Number(this.selectedSquad),
           this.selectedMap,
-          String(this.maps?.get(this.selectedMap)?.model)
+          String(this.maps?.get(this.selectedMap)?.model),
+          this.reserveAP
         );
         this.$q.notify({
           message: '游戏设定修改成功',
@@ -201,9 +218,20 @@ export default defineComponent({
         this.battle = this.config.isAutoBattle;
         this.recurit = this.config.autoRecruit;
         this.selectedMap = this.config.mapId;
+        this.reserveAP = this.config.reserveAP;
       },
       deep: true,
       immediate: true,
+    },
+    reserveAP() {
+      if (this.reserveAP <= 0) {
+        this.reserveAP = 0;
+      } else if (this.reserveAP >= 60) {
+        this.reserveAP = 60;
+      }
+      if (this.info.LiZhiMax >= 0 && this.info.LiZhiMax < this.reserveAP) {
+        this.reserveAP = this.info.LiZhiMax;
+      }
     },
   },
 });
