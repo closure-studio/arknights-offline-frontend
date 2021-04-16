@@ -1,5 +1,9 @@
-version: 1
-update_configs:
-  - package_manager: "javascript"
+version: 2
+updates:
+  - package-ecosystem: "yarn"
     directory: "/"
-    update_schedule: "live"
+    schedule:
+      # Check for updates managed by Composer once a week
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: "
