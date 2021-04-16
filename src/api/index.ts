@@ -112,7 +112,8 @@ class ApiConnection {
     autoRecruit: boolean,
     squadSelected: number,
     mapId: string,
-    modelName: string
+    modelName: string,
+    reserveAP: number
   ) {
     return (await this._processRequest('/game/setAutoBattle', {
       account,
@@ -120,7 +121,8 @@ class ApiConnection {
       autoRecruit,
       squadSelected,
       mapId,
-      modelName
+      modelName,
+      reserveAP
     })) as GeneralResponse<GameConfigData>;
   }
   static async getSystemInfo() {
