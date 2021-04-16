@@ -22,7 +22,7 @@
             autofocus
             counter
           />
-          <q-option-group v-model="device" inline :options="devices" />
+          <q-option-group v-model="device" inline :options="devices" disable />
         </q-form>
       </q-card-section>
       <q-card-actions align="right">
@@ -46,10 +46,10 @@ export default defineComponent({
     return {
       account: '',
       password: '',
-      device: 1 as 0 | 1,
+      device: 0 as 0 | 1,
       devices: [
-        { label: 'iOS', value: 0 },
-        { label: 'Android', value: 1 },
+        { label: '官服', value: 0 },
+        { label: 'B服(5月开放)', value: 1 },
       ] as { label: string; value: number }[],
     };
   },

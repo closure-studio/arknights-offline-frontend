@@ -33,9 +33,7 @@
           :to="`/game/${account.account}`"
           ><q-item-section avatar
             ><q-icon
-              :name="
-                account.platform ? 'android' : 'phone_iphone'
-              " /></q-item-section
+              :name="account.platform ? 'live_tv' : 'gavel'" /></q-item-section
           ><q-item-section
             ><q-item-label>{{ account.account }}</q-item-label>
             <q-item-section caption class="text-grey">
@@ -43,7 +41,7 @@
             </q-item-section></q-item-section
           >
           <q-item-label side top class="text-grey">
-            {{ account.platform ? 'Android' : 'iOS' }}
+            {{ account.platform ? 'B服' : '官服' }}
           </q-item-label>
         </q-item>
       </q-list>
