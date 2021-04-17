@@ -33,10 +33,10 @@
 </template>
 
 <script lang="ts">
-import SideBar from 'components/SideBar.vue';
+import SideBar from 'pages/SideBarView.vue';
 import DarkModeButton from 'components/DarkModeButton.vue';
 import LogoutButton from 'components/LogoutButton.vue';
-import WebSocketStatus from 'src/components/WebSocketStatus.vue';
+import WebSocketStatus from 'components/WebSocketStatus.vue';
 
 export default {
   components: { SideBar, DarkModeButton, LogoutButton, WebSocketStatus },

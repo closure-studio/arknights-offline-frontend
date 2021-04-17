@@ -31,17 +31,17 @@
           v-for="account in accounts"
           :key="account.account"
           :to="`/game/${account.account}`"
-          ><q-item-section avatar
-            ><q-icon
-              :name="account.platform ? 'live_tv' : 'gavel'" /></q-item-section
-          ><q-item-section
-            ><q-item-label>{{ account.account }}</q-item-label>
+          ><q-item-section avatar>
+            <q-icon :name="platformName(account.platform).icon" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ account.account }}</q-item-label>
             <q-item-section caption class="text-grey">
               {{ accountStatus.get(account.account) || '状态未知' }}
-            </q-item-section></q-item-section
-          >
+            </q-item-section>
+          </q-item-section>
           <q-item-label side top class="text-grey">
-            {{ account.platform ? 'B服' : '官服' }}
+            {{ platformName(account.platform).name }}
           </q-item-label>
         </q-item>
       </q-list>
@@ -67,7 +67,7 @@ import api from '../api';
 import { GameAccountData } from '../api/models';
 import { Store } from 'vuex';
 import { StateInterface } from '../store';
-import GameAccountForm from './GameAccountForm.vue';
+import GameAccountForm from '../components/GameAccountForm.vue';
 import utils from '../utils';
 
 export default defineComponent({
@@ -82,14 +82,18 @@ export default defineComponent({
   },
   methods: {
     refreshAccountData: async function () {
-      try {
-        this.loading = true;
-        const result = await api.getGamesAccounts();
-        this.accounts = result.data;
-      } catch (err) {
-        console.log(`Failed to refresh account data, error ${String(err)}`);
-      } finally {
-        this.loading = false;
+      if (this.userData) {
+        try {
+          this.loading = true;
+          const result = await api.getGamesAccounts();
+          this.accounts = result.data;
+        } catch (err) {
+          console.log(`Failed to refresh account data, error ${String(err)}`);
+        } finally {
+          this.loading = false;
+        }
+      } else {
+        console.log('Account is not login, stop data refresh');
       }
     },
     removeAccount: async function (account: string) {
@@ -107,11 +111,22 @@ export default defineComponent({
       })) as { account: string; password: string };
       void utils.dialog(this.$q, { message: String(data) });
     },
+    platformName: function (platform: number): { icon: string; name: string } {
+      switch (platform) {
+        case 0:
+          return { icon: 'phone_iphone', name: 'iOS' };
+        case 1:
+          return { icon: 'android', name: 'Android' };
+        case 2:
+          return { icon: 'live_tv', name: 'Bilibili' };
+        default:
+          return { icon: 'help', name: 'Unknown' };
+      }
+    },
   },
   mounted: function () {
     void this.refreshAccountData();
     setInterval(() => void this.refreshAccountData(), 10 * 1000);
-    setInterval(() => this.$forceUpdate(), 1000);
   },
   watch: {},
   computed: {
