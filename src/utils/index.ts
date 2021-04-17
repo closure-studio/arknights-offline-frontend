@@ -12,7 +12,6 @@ export default {
       quasar
         .dialog(options)
         .onCancel(() => reject('cancel'))
-        .onDismiss(() => reject('dismiss'))
         .onOk((data: unknown) => resolve(data));
     });
   },
