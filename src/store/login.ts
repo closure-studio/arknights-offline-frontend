@@ -23,8 +23,8 @@ const actions: ActionTree<LoginStateInterface, StateInterface> = {
     try {
       const result = await api.verifyToken();
       state.commit('login', {
-        username: result.data.name,
-        id: result.data.userID,
+        username: result.data.name.name,
+        id: result.data.name.ID,
         token: result.data.token
       });
     } catch (err) {

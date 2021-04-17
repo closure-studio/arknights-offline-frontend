@@ -2,6 +2,7 @@ import { axios } from '../boot/axios';
 import {
   GeneralResponse,
   UserInfoData,
+  TokenRefreshData,
   GameAccountData,
   GameInfoData,
   SystemInfoData,
@@ -59,7 +60,7 @@ class ApiConnection {
   }
   static async verifyToken() {
     return (await this._processRequest('/auth/verifyToken')) as GeneralResponse<
-      UserInfoData
+      TokenRefreshData
     >;
   }
   static async userRegister(username: string, password: string) {

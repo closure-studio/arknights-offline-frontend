@@ -8,6 +8,19 @@ export interface UserInfoData {
   name: string;
   token: string;
 }
+export interface TokenRefreshData {
+  name: {
+    ID: number;
+    name: string;
+    password: string;
+    isactivity: number;
+    isadmin: number;
+    registertime: string;
+    token: null | string;
+  };
+  userID: number;
+  token: string;
+}
 export interface SystemInfoData {
   launchTime: string;
 }
