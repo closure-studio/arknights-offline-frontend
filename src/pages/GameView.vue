@@ -6,9 +6,7 @@
   >
     <div v-if="!(gameAccount && account)" class="absolute-center text-center">
       <div class="text-h4">请先在右侧选择一个游戏帐号</div>
-      <q-btn icon="refresh" size="md" flat @click="getGameAccounData"
-        >刷新数据</q-btn
-      >
+      <q-btn icon="refresh" flat @click="getGameAccounData">刷新数据</q-btn>
     </div>
     <!--Game Login Prompt-->
     <q-card
@@ -28,7 +26,7 @@
         <q-btn icon="clear" @click="removeGame" flat color="negative">
           删除该帐号
         </q-btn>
-        <q-btn icon="refresh" @click="getGameAccounData" flat> 刷新数据 </q-btn>
+        <q-btn icon="refresh" @click="getGameAccounData" flat>刷新数据</q-btn>
       </q-card-actions>
     </q-card>
     <!--Game Detail Card-->
@@ -40,6 +38,7 @@
           >刷新数据</q-btn
         >
       </q-card-section>
+
       <q-tabs
         v-model="tab"
         active-color="primary"
@@ -78,26 +77,19 @@
 
         <q-tab-panel name="inventory">
           <div class="text-h6">库存</div>
-          共 {{ account.Inventory.length }} 种物品
+          <q-badge>共 {{ account.Inventory.length }} 种物品</q-badge>
           <q-separator />
-          <q-intersection transition="fade">
-            <q-chip
-              v-for="item in account.Inventory"
-              :key="item.Id"
-              size="xl"
-              class="shadow-1"
-            >
-              <q-avatar square size="xl">
-                <q-img :src="resourceURL(item.Id)" ratio="1"></q-img>
-              </q-avatar>
-              <div>
-                {{ item.CNName }}
-                <q-badge align="middle" outline color="primary"
-                  >{{ item.Quantity }}
-                </q-badge>
-              </div>
-            </q-chip>
-          </q-intersection>
+          <q-chip v-for="item in account.Inventory" :key="item.Id" size="xl">
+            <q-avatar square size="xl">
+              <q-img :src="resourceURL(item.Id)" ratio="1"></q-img>
+            </q-avatar>
+            <div>
+              {{ item.CNName }}
+              <q-badge align="middle" outline color="primary"
+                >{{ item.Quantity }}
+              </q-badge>
+            </div>
+          </q-chip>
         </q-tab-panel>
 
         <q-tab-panel name="settings">
@@ -135,7 +127,6 @@ import GameConfigControls from 'src/components/GameConfigControls.vue';
 export default defineComponent({
   components: {
     GameDetailCard,
-
     GameLogTimeline,
     GameConfigControls,
   },
@@ -151,12 +142,12 @@ export default defineComponent({
       const account = this.$route.params?.account as string | undefined;
       return account;
     },
-    backgroundStyle: function () {
+    backgroundStyle: function (): { [key: string]: string } {
       if (this.account?.PlayerStatus?.Mishu) {
         const url: string = this.resourceURL(
-          this.account.PlayerStatus.Mishu.Skin,
+          this.account.PlayerStatus.Mishu.Skin.replace('#', '_'),
           'webp'
-        ).replace('#', '_');
+        );
         return {
           'background-image': `url(${url})`,
           'background-repeat': 'no-repeat',

@@ -25,7 +25,7 @@
     <q-form @change="modified++">
       <div class="row justify-evenly items-center">
         <q-chip icon="pause" square>
-          暂停刷图:
+          暂停托管:
           <q-toggle v-model="paused" color="yellow" @input="applyPauseChange" />
         </q-chip>
 
