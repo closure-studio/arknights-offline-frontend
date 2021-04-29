@@ -55,7 +55,7 @@
           class="col-12 col-md-4"
           @filter="availableMaps"
           @input="modified++"
-          :options="maps ? Array.from(maps.values()) : null"
+          :options="maps"
         >
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
@@ -90,20 +90,24 @@ import { GameInfoData } from '../api/models';
 import GameSquadsPanel from './GameSquadsPanel.vue';
 import api from '../api';
 
+interface MapSection {
+  label: string;
+  description?: string;
+  map: string;
+  model: string;
+}
+
 export default defineComponent({
   components: { GameSquadsPanel },
   data: () => {
     return {
       modified: 0,
-      maps: null as null | Map<
-        string,
-        { label: string; value: string; description: string; model: string }
-      >,
+      maps: null as null | MapSection[],
       selectedSquad: '',
+      selectedMap: null as null | MapSection,
       paused: false,
       battle: false,
       recurit: false,
-      selectedMap: null as null | string,
       reserveAP: 0,
     };
   },
@@ -138,15 +142,14 @@ export default defineComponent({
       } else {
         try {
           const result = await api.getAllModels();
-          this.maps = new Map();
-          result.data.forEach((data) =>
-            this.maps?.set(data.mapId, {
-              label: data.mapId,
-              value: data.mapId,
-              model: data.modelName,
+          this.maps = result.data.map((data) => {
+            return {
+              label: data.mapId + '/' + data.modelName,
               description: data.description,
-            })
-          );
+              map: data.mapId,
+              model: data.modelName,
+            };
+          });
         } catch {
           abort();
         }
@@ -154,9 +157,6 @@ export default defineComponent({
       }
     },
     async submitConfigChange() {
-      if (!this.selectedMap) {
-        throw new Error();
-      }
       try {
         this.$q.loading.show();
         const result = await api.setAutoBattle(
@@ -164,12 +164,12 @@ export default defineComponent({
           this.battle,
           this.recurit,
           Number(this.selectedSquad),
-          this.selectedMap,
-          String(this.maps?.get(this.selectedMap)?.model),
+          this.selectedMap?.map || '',
+          this.selectedMap?.model || '',
           this.reserveAP
         );
         this.$q.notify({
-          message: '游戏设定修改成功',
+          message: '游戏设定修改完成',
           caption: result.message,
           type: 'positive',
           position: 'bottom',
@@ -217,7 +217,11 @@ export default defineComponent({
         this.paused = this.config.isPause;
         this.battle = this.config.isAutoBattle;
         this.recurit = this.config.autoRecruit;
-        this.selectedMap = this.config.mapId;
+        this.selectedMap = {
+          label: this.config.mapId + '/' + this.config.modelName,
+          map: this.config.mapId,
+          model: this.config.modelName,
+        };
         this.reserveAP = this.config.reserveAP;
       },
       deep: true,
