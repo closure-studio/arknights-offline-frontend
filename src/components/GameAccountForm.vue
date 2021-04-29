@@ -22,7 +22,7 @@
             autofocus
             counter
           />
-          <q-option-group v-model="device" inline :options="devices" disable />
+          <q-option-group v-model="device" inline :options="devices" />
         </q-form>
       </q-card-section>
       <q-card-actions align="right">
@@ -48,8 +48,9 @@ export default defineComponent({
       password: '',
       device: 0 as 0 | 1,
       devices: [
-        { label: '官服', value: 0 },
-        { label: 'B服(5月开放)', value: 1 },
+        { label: 'iOS', value: 0 },
+        { label: 'Android', value: 1 },
+        { label: 'B服(5月开放)', value: 2 },
       ] as { label: string; value: number }[],
     };
   },
@@ -89,6 +90,13 @@ export default defineComponent({
     },
 
     createAccount: async function () {
+      if (this.device >= 2) {
+        this.$q.notify({
+          type: 'negative',
+          message: 'B服登录尚未开放',
+          position: 'center',
+        });
+      }
       try {
         this.$q.loading.show();
         await api.createGame(this.account, this.password, this.device);
