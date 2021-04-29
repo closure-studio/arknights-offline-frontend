@@ -2,7 +2,7 @@
   <q-layout view="hHh lpR fFf">
     <q-header elevated class="bg-primary text-white" height-hint="98">
       <q-toolbar>
-        <q-toolbar-title> 明日方舟离线托管 </q-toolbar-title>
+        <q-toolbar-title> 可露希尔工作室 </q-toolbar-title>
         <q-space />
         <q-separator vertical />
         <logout-button />

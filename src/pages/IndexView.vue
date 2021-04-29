@@ -2,7 +2,7 @@
   <q-page class="row justify-center items-center">
     <q-card class="col-6 shadow-1">
       <q-card-section>
-        <div class="text-h4">明日方舟离线托管</div>
+        <div class="text-h4">可露希尔工作室</div>
       </q-card-section>
       <q-separator />
       <q-card-section>
