@@ -79,17 +79,17 @@
           <div class="text-h6">库存</div>
           <q-badge>共 {{ account.Inventory.length }} 种物品</q-badge>
           <q-separator />
-          <q-chip v-for="item in account.Inventory" :key="item.Id" size="xl">
-            <q-avatar square size="xl">
-              <q-img :src="resourceURL(item.Id)" ratio="1"></q-img>
-            </q-avatar>
-            <div>
-              {{ item.CNName }}
-              <q-badge align="middle" outline color="primary"
-                >{{ item.Quantity }}
-              </q-badge>
+          <q-card-section class="row">
+            <div
+              class="col-2 col-md-1 text-center"
+              v-for="item in account.Inventory"
+              :key="item.Id"
+            >
+              <q-img :src="resourceURL(item.Id)" :ratio="1" />
+              <q-badge>{{ item.Quantity }}</q-badge>
+              <q-tooltip>{{ item.CNName }}</q-tooltip>
             </div>
-          </q-chip>
+          </q-card-section>
         </q-tab-panel>
 
         <q-tab-panel name="settings">
