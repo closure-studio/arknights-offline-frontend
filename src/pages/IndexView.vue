@@ -14,6 +14,7 @@
           <template v-slot:avatar>
             <q-icon name="warning" />
           </template>
+          <div class="text-body1">Bug汇报,使用交流群: 873541574 </div>
           <div class="text-body1">非盈利性公益项目,且用且珍惜</div>
           <div class="text-body1">请勿泄露您的任何账号</div>
           <div class="text-body1">请勿肆处宣扬本网站</div>
