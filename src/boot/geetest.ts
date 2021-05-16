@@ -29,7 +29,7 @@ interface CaptchaObj {
 
 interface GeetestInit {
   (
-    params: {
+    userConfig: {
       gt: string;
       challenge: string;
       offline: boolean;
