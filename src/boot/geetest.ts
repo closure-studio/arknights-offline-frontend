@@ -1,9 +1,9 @@
 import geetest from '../utils/geetest';
 import { boot } from 'quasar/wrappers';
 
-interface Callback<T = undefined> {
+interface Callback {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (arg0: T): any;
+  (arg0: { (): void }): void;
 }
 
 interface CaptchaObj {
@@ -59,7 +59,7 @@ interface GeetestInit {
       hideClose?: boolean;
       hideRefresh?: boolean;
     },
-    callback: Callback<CaptchaObj>
+    callback: { (obj: CaptchaObj): void }
   ): '';
 }
 

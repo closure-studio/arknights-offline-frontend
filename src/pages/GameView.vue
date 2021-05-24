@@ -11,11 +11,40 @@
     <!--Game Login Prompt-->
     <q-card
       v-else-if="!(account.PlayerStatus && account.Inventory)"
-      class="col-6 shadow-1"
+      class="col-12 col-md-6 shadow-1"
     >
       <q-card-section>
         <div class="text-h5">请先登录该帐号</div>
-        <div class="text-subtitle">如已登录, 请稍等</div>
+        <div
+          v-if="!account.GameConfig.captchaData"
+          class="text-subtitle q-pa-md"
+        >
+          如已登录, 请稍等
+        </div>
+        <div v-else class="q-pa-md">
+          <div class="text-subtitle">
+            {{ account.GameConfig.captchaData.error }}
+          </div>
+          <q-item>
+            <q-item-section avatar>
+              <q-btn
+                icon="verify"
+                color="accent"
+                flat
+                dense
+                @click="loadCaptcha"
+              >
+                加载验证码
+              </q-btn>
+            </q-item-section>
+            <q-item-section>
+              <div
+                id="captcha"
+                :style="{ width: '300px', height: '44px' }"
+              ></div>
+            </q-item-section>
+          </q-item>
+        </div>
         <q-chip icon="person">帐号: {{ gameAccount }}</q-chip>
       </q-card-section>
       <q-separator spaced />
@@ -218,6 +247,65 @@ export default defineComponent({
         } finally {
           this.$q.loading.hide();
         }
+      }
+    },
+    loadCaptcha() {
+      if (!this.account?.GameConfig.captchaData?.captcha) {
+        return;
+      }
+      this.$initGeetest(
+        {
+          product: 'float',
+          gt: this.account.GameConfig.captchaData.captcha.gt,
+          challenge: this.account.GameConfig.captchaData.captcha.challenge,
+          new_captcha: this.account.GameConfig.captchaData.captcha.new_captcha,
+          offline: false,
+          https: true,
+        },
+        (obj) => {
+          obj.onError(() => {
+            this.$q.notify({
+              type: 'negative',
+              position: 'top',
+              message: '验证码加载失败',
+              closeBtn: '重新登录',
+              progress: true,
+              onDismiss: () => void this.loginGame(),
+            });
+          });
+          obj.appendTo('#captcha');
+          obj.onSuccess(() => {
+            const data = obj.getValidate();
+            if (!data) {
+              throw new Error();
+            }
+            void this.submitCaptcha(
+              data.geetest_challenge,
+              data.geetest_validate,
+              data.geetest_seccode
+            );
+          });
+        }
+      );
+    },
+    async submitCaptcha(challenge: string, validate: string, seccode: string) {
+      try {
+        this.$q.loading.show();
+        const result = await api.setCaptchaData(
+          String(this.gameAccount),
+          challenge,
+          seccode,
+          validate
+        );
+        this.$q.notify({
+          type: 'positive',
+          position: 'top',
+          message: '验证码提交成功',
+          progress: true,
+          caption: result.message,
+        });
+      } finally {
+        this.$q.loading.hide();
       }
     },
     // eslint-disable-next-line @typescript-eslint/unbound-method

@@ -89,10 +89,10 @@ export interface GameInfoData {
     modelName: string;
     reserveAP: number;
     autoRecruit: boolean;
-    captchaData: {
+    captchaData?: {
       result: number;
       error: string;
-      captcha?: {
+      captcha: {
         success: number;
         challenge: string;
         gt: string;
