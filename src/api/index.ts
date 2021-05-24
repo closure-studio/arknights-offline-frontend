@@ -126,6 +126,19 @@ class ApiConnection {
       reserveAP
     })) as GeneralResponse<GameConfigData>;
   }
+  static async setCaptchaData(
+    account: string,
+    geetest_challenge: string,
+    geetest_seccode: string,
+    geetest_validate: string
+  ) {
+    return await this._processRequest('/game/setCaptchaData', {
+      account,
+      geetest_challenge,
+      geetest_seccode,
+      geetest_validate
+    });
+  }
   static async getSystemInfo() {
     return (await this._processRequest(
       '/system/getSystemInfo'

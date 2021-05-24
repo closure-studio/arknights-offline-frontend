@@ -89,6 +89,16 @@ export interface GameInfoData {
     modelName: string;
     reserveAP: number;
     autoRecruit: boolean;
+    captchaData: {
+      result: number;
+      error: string;
+      captcha?: {
+        success: number;
+        challenge: string;
+        gt: string;
+        new_captcha: boolean;
+      };
+    };
   };
 }
 export interface GameConfigData {

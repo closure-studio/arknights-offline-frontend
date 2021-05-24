@@ -7,7 +7,7 @@ interface Callback<T = undefined> {
 }
 
 interface CaptchaObj {
-  appendTo: { (position: string): void };
+  appendTo: { (position: string | HTMLElement): void };
   bindForm: { (position: string): void };
   getValidate: {
     ():
