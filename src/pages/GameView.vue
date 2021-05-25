@@ -22,28 +22,26 @@
           如已登录, 请稍等
         </div>
         <div v-else class="q-pa-md">
-          <div class="text-subtitle">
-            {{ account.GameConfig.captchaData.error }}
+          <div class="row justify-evenly">
+            <q-btn
+              icon="fingerprint"
+              color="accent"
+              flat
+              dense
+              @click="loadCaptcha"
+            >
+              加载验证码
+            </q-btn>
+            <div
+              id="captcha"
+              :style="{
+                width: '300px',
+                height: '44px',
+                backgroundImage: 'url(~assets/background.webp)',
+              }"
+              class="rounded-borders shadow-1"
+            ></div>
           </div>
-          <q-item>
-            <q-item-section avatar>
-              <q-btn
-                icon="verify"
-                color="accent"
-                flat
-                dense
-                @click="loadCaptcha"
-              >
-                加载验证码
-              </q-btn>
-            </q-item-section>
-            <q-item-section>
-              <div
-                id="captcha"
-                :style="{ width: '300px', height: '44px' }"
-              ></div>
-            </q-item-section>
-          </q-item>
         </div>
         <q-chip icon="person">帐号: {{ gameAccount }}</q-chip>
       </q-card-section>
@@ -250,15 +248,18 @@ export default defineComponent({
       }
     },
     loadCaptcha() {
-      if (!this.account?.GameConfig.captchaData?.captcha) {
-        return;
+      if (!this.account?.GameConfig.captchaData) {
+        throw new Error('Captcha data not exists.');
       }
+      const data = this.account.GameConfig.captchaData.captcha
+        ? this.account.GameConfig.captchaData.captcha
+        : this.account.GameConfig.captchaData;
       this.$initGeetest(
         {
           product: 'float',
-          gt: this.account.GameConfig.captchaData.captcha.gt,
-          challenge: this.account.GameConfig.captchaData.captcha.challenge,
-          new_captcha: this.account.GameConfig.captchaData.captcha.new_captcha,
+          gt: data.gt,
+          challenge: data.challenge,
+          new_captcha: true,
           offline: false,
           https: true,
         },
