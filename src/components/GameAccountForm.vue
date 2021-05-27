@@ -50,7 +50,7 @@ export default defineComponent({
       devices: [
         { label: 'iOS', value: 0 },
         { label: 'Android', value: 1 },
-        { label: 'B服(5月开放)', value: 2 },
+        { label: 'B服', value: 2 },
       ] as { label: string; value: number }[],
     };
   },
@@ -90,13 +90,6 @@ export default defineComponent({
     },
 
     createAccount: async function () {
-      if (this.device >= 2) {
-        this.$q.notify({
-          type: 'negative',
-          message: 'B服登录尚未开放',
-          position: 'center',
-        });
-      }
       try {
         this.$q.loading.show();
         await api.createGame(this.account, this.password, this.device);

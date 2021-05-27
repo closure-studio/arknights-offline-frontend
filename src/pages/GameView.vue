@@ -14,42 +14,34 @@
       class="col-12 col-md-6 shadow-1"
     >
       <q-card-section>
-        <div class="text-h5">请先登录该帐号</div>
-        <div
-          v-if="!account.GameConfig.captchaData"
-          class="text-subtitle q-pa-md"
-        >
-          如已登录, 请稍等
-        </div>
-        <div v-else class="q-pa-md">
-          <div class="row justify-evenly">
-            <q-btn
-              icon="fingerprint"
-              color="accent"
-              flat
-              dense
-              @click="loadCaptcha"
-            >
-              加载验证码
-            </q-btn>
-            <div
-              id="captcha"
-              :style="{
-                width: '300px',
-                height: '44px',
-                backgroundImage: 'url(~assets/background.webp)',
-              }"
-              class="rounded-borders shadow-1"
-            ></div>
-          </div>
-        </div>
-        <q-chip icon="person">帐号: {{ gameAccount }}</q-chip>
+        <div class="text-h5 q-pa-xs">请先登录该帐号</div>
+        <q-chip icon="more">
+          <strong>
+            {{
+              account.GameConfig.captchaData
+                ? '请完成人机验证'
+                : '如已登录, 请稍等'
+            }}
+          </strong>
+        </q-chip>
+        <q-chip icon="person">
+          <code>{{ gameAccount }}</code>
+        </q-chip>
       </q-card-section>
       <q-separator spaced />
       <q-card-actions align="evenly">
-        <q-btn icon="vpn_key" @click="loginGame" flat color="positive">
+        <q-btn
+          v-if="account.GameConfig.captchaData"
+          icon="fingerprint"
+          @click="loadCaptcha"
+          flat
+          color="accent"
+          >加载验证码
+        </q-btn>
+        <q-btn v-else icon="vpn_key" @click="loginGame" flat color="positive">
           登录该帐号
         </q-btn>
+        <q-separator vertical />
         <q-btn icon="clear" @click="removeGame" flat color="negative">
           删除该帐号
         </q-btn>
@@ -143,13 +135,16 @@
 </template>
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import api from '../api';
-import { GameInfoData } from '../api/models';
 import { QAjaxBar } from 'quasar';
-import GameDetailCard from 'src/components/GameDetailCard.vue';
+
+import { GameInfoData } from '../api/models';
+import api from '../api';
 import utils from '../utils';
+
+import GameDetailCard from 'src/components/GameDetailCard.vue';
 import GameLogTimeline from 'src/components/GameLogTimeline.vue';
 import GameConfigControls from 'src/components/GameConfigControls.vue';
+import GameCaptchaDialog from 'src/components/GameCaptchaDialog.vue';
 
 export default defineComponent({
   components: {
@@ -157,7 +152,6 @@ export default defineComponent({
     GameLogTimeline,
     GameConfigControls,
   },
-  props: {},
   data: function () {
     return {
       account: null as GameInfoData | null,
@@ -247,66 +241,28 @@ export default defineComponent({
         }
       }
     },
-    loadCaptcha() {
+    async loadCaptcha() {
       if (!this.account?.GameConfig.captchaData) {
         throw new Error('Captcha data not exists.');
       }
       const data = this.account.GameConfig.captchaData.captcha
         ? this.account.GameConfig.captchaData.captcha
         : this.account.GameConfig.captchaData;
-      this.$initGeetest(
-        {
-          product: 'float',
+      try {
+        await utils.dialog(this.$q, {
+          parent: this,
+          component: GameCaptchaDialog,
           gt: data.gt,
           challenge: data.challenge,
-          new_captcha: true,
-          offline: false,
-          https: true,
-        },
-        (obj) => {
-          obj.onError(() => {
-            this.$q.notify({
-              type: 'negative',
-              position: 'top',
-              message: '验证码加载失败',
-              closeBtn: '重新登录',
-              progress: true,
-              onDismiss: () => void this.loginGame(),
-            });
-          });
-          obj.appendTo('#captcha');
-          obj.onSuccess(() => {
-            const data = obj.getValidate();
-            if (!data) {
-              throw new Error();
-            }
-            void this.submitCaptcha(
-              data.geetest_challenge,
-              data.geetest_validate,
-              data.geetest_seccode
-            );
-          });
-        }
-      );
-    },
-    async submitCaptcha(challenge: string, validate: string, seccode: string) {
-      try {
-        this.$q.loading.show();
-        const result = await api.setCaptchaData(
-          String(this.gameAccount),
-          challenge,
-          seccode,
-          validate
-        );
-        this.$q.notify({
-          type: 'positive',
-          position: 'top',
-          message: '验证码提交成功',
-          progress: true,
-          caption: result.message,
+          account: this.gameAccount,
         });
-      } finally {
-        this.$q.loading.hide();
+      } catch {
+        this.$q.notify({
+          type: 'negative',
+          message: '验证码验证失败',
+          closeBtn: '重新登录',
+          onDismiss: () => void this.loginGame(),
+        });
       }
     },
     // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -321,8 +277,8 @@ export default defineComponent({
     void this.getGameAccounData();
     next();
   },
-  setup(props) {
-    return { ...props };
+  setup() {
+    return {};
   },
 });
 </script>
