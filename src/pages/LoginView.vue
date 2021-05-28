@@ -37,7 +37,10 @@ export default defineComponent({
     register: async function (value: { username: string; password: string }) {
       try {
         this.$q.loading.show();
-        await api.userRegister(value.username, value.password);
+        await api.userRegister({
+          username: value.username,
+          password: value.password,
+        });
         await this.login(value);
       } finally {
         this.$q.loading.hide();

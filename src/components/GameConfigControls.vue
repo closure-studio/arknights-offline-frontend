@@ -159,15 +159,15 @@ export default defineComponent({
     async submitConfigChange() {
       try {
         this.$q.loading.show();
-        const result = await api.setAutoBattle(
-          this.$props.account,
-          this.battle,
-          this.recurit,
-          Number(this.selectedSquad),
-          this.selectedMap?.map || '',
-          this.selectedMap?.model || '',
-          this.reserveAP
-        );
+        const result = await api.setAutoBattle({
+          account: this.$props.account,
+          autoBattle: this.battle,
+          autoRecruit: this.recurit,
+          squadSelected: Number(this.selectedSquad),
+          mapId: this.selectedMap?.map || '',
+          modelName: this.selectedMap?.model || '',
+          reserveAP: this.reserveAP,
+        });
         this.$q.notify({
           message: '游戏设定修改完成',
           caption: result.message,
@@ -184,9 +184,9 @@ export default defineComponent({
       try {
         this.$q.loading.show();
         if (value) {
-          await api.setGamePause(this.$props.account);
+          await api.setGamePause({ account: this.$props.account });
         } else {
-          await api.setGameResume(this.$props.account);
+          await api.setGameResume({ account: this.$props.account });
         }
         this.$q.notify({
           message: '暂停状态修改成功',

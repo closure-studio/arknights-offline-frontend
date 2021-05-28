@@ -7,10 +7,6 @@ declare module 'vue/types/vue' {
   }
 }
 
-axios.defaults.baseURL = 'https://akapi.nai-ve.com';
-axios.defaults.timeout = 6000;
-
-export { axios };
 export default boot(({ Vue }) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   Vue.prototype.$axios = axios;

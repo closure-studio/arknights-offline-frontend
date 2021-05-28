@@ -21,7 +21,7 @@
           <div class="text-body1">感谢您的使用</div>
         </q-banner>
 
-        <q-scroll-area style="height: calc(40vh)">
+        <q-scroll-area :style="{ height: 'calc(40vh)' }">
           <q-timeline
             color="primary"
             layout="comfortable"

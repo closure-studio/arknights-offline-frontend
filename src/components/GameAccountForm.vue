@@ -92,7 +92,11 @@ export default defineComponent({
     createAccount: async function () {
       try {
         this.$q.loading.show();
-        await api.createGame(this.account, this.password, this.device);
+        await api.createGame({
+          account: this.account,
+          password: this.password,
+          platform: this.device,
+        });
         this.$q.notify({
           type: 'positive',
           message: '托管帐号添加成功',

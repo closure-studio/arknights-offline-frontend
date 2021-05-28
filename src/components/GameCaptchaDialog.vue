@@ -105,12 +105,12 @@ export default defineComponent({
     async submitCaptcha(challenge: string, seccode: string, validate: string) {
       try {
         this.$q.loading.show();
-        const result = await api.setCaptchaData(
-          this.$props.account,
-          challenge,
-          seccode,
-          validate
-        );
+        const result = await api.setCaptchaData({
+          account: this.$props.account,
+          geetest_challenge: challenge,
+          geetest_seccode: seccode,
+          geetest_validate: validate,
+        });
         this.$q.notify({
           type: 'positive',
           position: 'top',

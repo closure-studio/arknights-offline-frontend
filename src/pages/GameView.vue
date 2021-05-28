@@ -189,7 +189,7 @@ export default defineComponent({
       if (!!account) {
         try {
           this.loadingBar.start();
-          const result = await api.getGameData(account);
+          const result = await api.getGameData({ account });
           this.account = result.data;
         } catch {
           this.account = null;
@@ -205,7 +205,7 @@ export default defineComponent({
       if (!!account) {
         try {
           this.$q.loading.show();
-          const result = await api.gameLogin(account);
+          const result = await api.gameLogin({ account });
           this.$q.notify({
             color: 'positive',
             position: 'top',
@@ -227,7 +227,7 @@ export default defineComponent({
         });
         try {
           this.$q.loading.show();
-          await api.delGame(account);
+          await api.delGame({ account });
           this.$q.notify({
             type: 'positive',
             position: 'center',

@@ -95,7 +95,7 @@ export default defineComponent({
     removeAccount: async function (account: string) {
       try {
         this.$q.loading.show();
-        await api.delGame(account);
+        await api.delGame({ account });
       } finally {
         this.$q.loading.hide();
       }
