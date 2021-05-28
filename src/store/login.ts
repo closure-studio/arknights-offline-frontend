@@ -33,7 +33,10 @@ const actions: ActionTree<LoginStateInterface, StateInterface> = {
     }
   },
   async loginAccount(state, account: { username: string; password: string }) {
-    const result = await api.userLogin(account.username, account.password);
+    const result = await api.userLogin({
+      username: account.username,
+      password: account.password
+    });
     state.commit('login', {
       username: result.data.name,
       id: result.data.userID,

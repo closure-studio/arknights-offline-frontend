@@ -1,154 +1,114 @@
-import { axios } from '../boot/axios';
-import {
-  GeneralResponse,
-  UserInfoData,
-  TokenRefreshData,
-  GameAccountData,
-  GameInfoData,
-  SystemInfoData,
-  GameConfigData,
-  GameMapData
-} from './models';
-import { AxiosError } from 'axios';
 import Vue from 'vue';
+import _axios, { AxiosError } from 'axios';
 import { Store } from 'vuex';
 import { QVueGlobals } from 'quasar';
+
+import * as models from './models';
 import { StateInterface } from '../store';
 
-class ApiConnection {
-  private static async _processRequest(endpoint: string, data?: unknown) {
+const axios = _axios.create({
+  timeout: 6000,
+  baseURL: process.env.API_ADDRESS || 'https://akapi.nai-ve.com',
+  responseType: 'json'
+});
+
+async function request<T = unknown>(endpoint: string, data?: unknown) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const store = Vue.prototype.$store as Store<StateInterface>;
+  const token = store.state.login.account?.token;
+  axios.defaults.headers = token ? { Token: token } : {};
+
+  try {
+    const response = await axios.post(endpoint, data);
+    return response.data as models.GeneralResponse<T>;
+  } catch (err) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const store = Vue.prototype.$store as Store<StateInterface>;
-    const token = store.state.login.account?.token;
-    try {
-      const response = await axios.post(endpoint, data || {}, {
-        headers: !!token ? { Token: token } : {}
+    const quasar = Vue.prototype.$q as QVueGlobals;
+    const error = err as AxiosError<models.GeneralResponse>;
+
+    if (error.response) {
+      quasar.notify({
+        type: 'negative',
+        progress: true,
+        position: 'top',
+        message: `服务器返回错误 - ${error.response.status}`,
+        caption: error.response.data.message
       });
-      return response.data as GeneralResponse;
-    } catch (err) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (typeof err === 'object' && err.isAxiosError === true) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const quasar = Vue.prototype.$q as QVueGlobals;
-        const error = err as AxiosError<GeneralResponse>;
-        if (!!error.response) {
-          quasar.notify({
-            progress: true,
-            position: 'top',
-            type: 'negative',
-            message: `服务器返回错误(${error.response.status})`,
-            caption: `${error.response.data.message}`
-          });
-        } else {
-          quasar.notify({
-            progress: true,
-            position: 'top',
-            type: 'negative',
-            message: '网络请求错误',
-            caption: error.message
-          });
-        }
-      }
-      throw err;
+    } else {
+      quasar.notify({
+        type: 'negative',
+        progress: true,
+        position: 'top',
+        message: '网络请求过程出错',
+        caption: error.message
+      });
     }
-  }
-  static async userLogin(username: string, password: string) {
-    return (await this._processRequest('/auth/userlogin', {
-      username,
-      password
-    })) as GeneralResponse<UserInfoData>;
-  }
-  static async verifyToken() {
-    return (await this._processRequest('/auth/verifyToken')) as GeneralResponse<
-      TokenRefreshData
-    >;
-  }
-  static async userRegister(username: string, password: string) {
-    return (await this._processRequest('/auth/userregister', {
-      username,
-      password
-    })) as GeneralResponse<UserInfoData>;
-  }
-  static async getGamesAccounts() {
-    return (await this._processRequest(
-      '/user/getGamesAccounts'
-    )) as GeneralResponse<GameAccountData[]>;
-  }
-  static async createGame(account: string, password: string, platform: 0 | 1) {
-    return (await this._processRequest('/user/createGame', {
-      account,
-      password,
-      platform
-    })) as GeneralResponse<GameAccountData[]>;
-  }
-  static async delGame(account: string) {
-    return (await this._processRequest('/user/delGame', {
-      account,
-      password: ''
-    })) as GeneralResponse<GameAccountData[]>;
-  }
-  static async getGameData(account: string) {
-    return (await this._processRequest('/game/getGameData', {
-      account
-    })) as GeneralResponse<GameInfoData>;
-  }
-  static async gameLogin(account: string) {
-    return (await this._processRequest('/game/gameLogin', {
-      account
-    })) as GeneralResponse<[]>;
-  }
-  static async setGamePause(account: string) {
-    return (await this._processRequest('/game/setGamePause', {
-      account
-    })) as GeneralResponse<[]>;
-  }
-  static async setGameResume(account: string) {
-    return (await this._processRequest('/game/setGameResume', {
-      account
-    })) as GeneralResponse<[]>;
-  }
-  static async setAutoBattle(
-    account: string,
-    autoBattle: boolean,
-    autoRecruit: boolean,
-    squadSelected: number,
-    mapId: string,
-    modelName: string,
-    reserveAP: number
-  ) {
-    return (await this._processRequest('/game/setAutoBattle', {
-      account,
-      autoBattle,
-      autoRecruit,
-      squadSelected,
-      mapId,
-      modelName,
-      reserveAP
-    })) as GeneralResponse<GameConfigData>;
-  }
-  static async setCaptchaData(
-    account: string,
-    geetest_challenge: string,
-    geetest_seccode: string,
-    geetest_validate: string
-  ) {
-    return await this._processRequest('/game/setCaptchaData', {
-      account,
-      geetest_challenge,
-      geetest_seccode,
-      geetest_validate
-    });
-  }
-  static async getSystemInfo() {
-    return (await this._processRequest(
-      '/system/getSystemInfo'
-    )) as GeneralResponse<SystemInfoData>;
-  }
-  static async getAllModels() {
-    return (await this._processRequest(
-      '/system/getAllModels'
-    )) as GeneralResponse<GameMapData[]>;
+
+    throw error;
   }
 }
 
-export default ApiConnection;
+export default {
+  async userLogin(data: { username: string; password: string }) {
+    return await request<models.UserInfoData>('/auth/userlogin', data);
+  },
+  async verifyToken() {
+    return await request<models.TokenRefreshData>('/auth/verifyToken');
+  },
+  async userRegister(data: { username: string; password: string }) {
+    return await request<models.UserInfoData>('/auth/useruserregister', data);
+  },
+  async getGamesAccounts() {
+    return await request<models.GameAccountData[]>('/user/getGamesAccounts');
+  },
+  async createGame(data: {
+    account: string;
+    password: string;
+    platform: number;
+  }) {
+    return await request<models.GameAccountData[]>('/user/createGame', data);
+  },
+  async delGame(data: { account: string }) {
+    return await request<models.GameAccountData[]>('/user/delGame', {
+      ...data,
+      password: ''
+    });
+  },
+  async getGameData(data: { account: string }) {
+    return await request<models.GameInfoData>('/game/getGameData', data);
+  },
+  async gameLogin(data: { account: string }) {
+    return await request<[]>('/game/gameLogin', data);
+  },
+  async setGamePause(data: { account: string }) {
+    return await request<[]>('/game/setGamePause', data);
+  },
+  async setGameResume(data: { account: string }) {
+    return await request<[]>('/game/setGameResume', data);
+  },
+  async setAutoBattle(data: {
+    account: string;
+    autoBattle: boolean;
+    autoRecruit: boolean;
+    squadSelected: number;
+    mapId: string;
+    modelName: string;
+    reserveAP: number;
+  }) {
+    return await request<models.GameConfigData>('/game/setAutoBattle', data);
+  },
+  async setCaptchaData(data: {
+    account: string;
+    geetest_challenge: string;
+    geetest_seccode: string;
+    geetest_validate: string;
+  }) {
+    return await request<models.GameInfoData>('/game/setCaptchaData', data);
+  },
+  async getSystemInfo() {
+    return await request<models.SystemInfoData>('/system/getSystemInfo');
+  },
+  async getAllModels() {
+    return await request<models.GameMapData[]>('/system/getAllModels');
+  }
+};
