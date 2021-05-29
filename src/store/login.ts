@@ -1,7 +1,8 @@
 import { Module, ActionTree, GetterTree, MutationTree } from 'vuex';
 import { LocalStorage } from 'quasar';
-import { StateInterface } from './index';
+
 import api from '../api';
+import { StateInterface } from './index';
 
 export interface AccountObject {
   username: string;
@@ -20,8 +21,13 @@ const state = function(): LoginStateInterface {
 
 const actions: ActionTree<LoginStateInterface, StateInterface> = {
   async refreshToken(state) {
+    if (!this.state.login.account?.id) {
+      throw new Error('Failed to refresh token, no uid in local.');
+    }
     try {
-      const result = await api.verifyToken();
+      const result = await api.verifyToken({
+        uid: this.state.login.account.id
+      });
       state.commit('login', {
         username: result.data.name.name,
         id: result.data.name.ID,

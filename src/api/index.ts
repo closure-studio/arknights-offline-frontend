@@ -6,9 +6,16 @@ import { QVueGlobals } from 'quasar';
 import * as models from './models';
 import { StateInterface } from '../store';
 
-const axios = _axios.create({
+export const baseApi = new URL(
+  process.env.API_ADDRESS || 'https://akapi.nai-ve.com'
+);
+export const baseStatic = new URL(
+  process.env.STATIC_ADDRESS || 'https://akres.nai-ve.com'
+);
+
+export const axios = _axios.create({
   timeout: 6000,
-  baseURL: process.env.API_ADDRESS || 'https://akapi.nai-ve.com',
+  baseURL: baseApi.toString(),
   responseType: 'json'
 });
 
@@ -52,8 +59,8 @@ export default {
   async userLogin(data: { username: string; password: string }) {
     return await request<models.UserInfoData>('/auth/userlogin', data);
   },
-  async verifyToken() {
-    return await request<models.TokenRefreshData>('/auth/verifyToken');
+  async verifyToken(data: { uid: number }) {
+    return await request<models.TokenRefreshData>('/auth/verifyToken', data);
   },
   async userRegister(data: { username: string; password: string }) {
     return await request<models.UserInfoData>('/auth/useruserregister', data);

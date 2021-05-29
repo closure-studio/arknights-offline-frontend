@@ -1,6 +1,8 @@
 import { QVueGlobals, QDialogOptions } from 'quasar';
 import VueRouter from 'vue-router';
 
+import { baseStatic } from '../api';
+
 export default {
   async sleep(ms: number) {
     await new Promise(resolve => {
@@ -20,8 +22,7 @@ export default {
       return await router.push(path);
     }
   },
-  resource(name: string, ext?: string): string {
-    ext = ext || 'webp';
-    return `https://akres.nai-ve.com/${name}.${ext}`;
+  resource(name: string, ext = 'webp'): string {
+    return new URL(`${name}.${ext}`, baseStatic).toString();
   }
 };

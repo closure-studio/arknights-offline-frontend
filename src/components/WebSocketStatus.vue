@@ -11,6 +11,7 @@
 import { defineComponent } from '@vue/composition-api';
 import { Store } from 'vuex';
 import { StateInterface } from '../store';
+import { baseApi } from '../api';
 
 export default defineComponent({
   data: () => {
@@ -27,8 +28,9 @@ export default defineComponent({
         return;
       }
 
-      const host = new URL(this.$axios.defaults.baseURL as string).host;
-      const ws = new WebSocket(`wss://${host}/ws/?token=${token}`);
+      const ws = new WebSocket(
+        new URL('/ws/?token=' + token, baseApi).toString()
+      );
 
       ws.addEventListener('open', (event) => {
         store.commit('activity/connect');
