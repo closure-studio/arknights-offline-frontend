@@ -63,7 +63,7 @@ export default {
     return await request<models.TokenRefreshData>('/auth/verifyToken', data);
   },
   async userRegister(data: { username: string; password: string }) {
-    return await request<models.UserInfoData>('/auth/useruserregister', data);
+    return await request<models.UserInfoData>('/auth/userregister', data);
   },
   async getGamesAccounts() {
     return await request<models.GameAccountData[]>('/user/getGamesAccounts');

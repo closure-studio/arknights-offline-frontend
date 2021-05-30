@@ -28,9 +28,7 @@ export default defineComponent({
         return;
       }
 
-      const ws = new WebSocket(
-        new URL('/ws/?token=' + token, baseApi).toString()
-      );
+      const ws = new WebSocket(`wss://${baseApi.host}/ws/?token=${token}`);
 
       ws.addEventListener('open', (event) => {
         store.commit('activity/connect');
