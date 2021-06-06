@@ -9,6 +9,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   - workflow_dispatch
 
+env:
+  TARGET_REGISTRY: https://registry.yarnpkg.com
+  ORIGIN_REGISTRY: https://registry.npm.taobao.org
+
 jobs:
   lint:
     name: Lint
@@ -22,6 +26,9 @@ jobs:
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
+
+      - name: Replace registry
+        run: sed -i -e "s#$TARGET_REGISTRY/#$ORIGIN_REGISTRY#g" yarn.lock
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -51,6 +58,9 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
 
+      - name: Replace registry
+        run: sed -i -e "s#$TARGET_REGISTRY/#$ORIGIN_REGISTRY#g" yarn.lock
+
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -66,7 +76,7 @@ jobs:
         run: yarn install
 
       - name: Build dist
-        run: quasar build
+        run: yarn run quasar build
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v2
