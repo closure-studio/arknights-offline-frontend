@@ -1,26 +1,31 @@
-# Arknights Offline (arknight-offilne-frontend)
+# ClosureFrontline (arknight-offilne-frontend)
 
-Offline game agent for Arknights
+**Official frontend for [Closure Studio](https://ak.nai-ve.com/)**
 
-## Install the dependencies
+---
+
+## Deployment
+
+### Install the dependencies
+
 ```bash
-yarn
+yarn install
 ```
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
+
 ```bash
 quasar dev
 ```
 
 ### Lint the files
+
 ```bash
 yarn run lint
 ```
 
 ### Build the app for production
+
 ```bash
 quasar build
 ```
-
-### Customize the configuration
-See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).
