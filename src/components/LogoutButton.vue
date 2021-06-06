@@ -16,14 +16,14 @@ import api from '../api';
 export default defineComponent({
   methods: {
     logout() {
-      this.$q
-        .dialog({
+      void utils
+        .dialog(this.$q, {
           title: '帐号退出确认',
           message: '您确定要退出当前帐号嘛?',
           cancel: true,
           persistent: true,
         })
-        .onOk(() => this.$store.commit('login/logout'));
+        .then(() => this.$store.commit('login/logout'));
     },
     accountActivityListener(account: AccountObject | null) {
       if (!account) {
@@ -43,6 +43,26 @@ export default defineComponent({
         });
       }
     },
+    async checkLoginStatus() {
+      if (!this.state.account) {
+        return;
+      }
+      console.log('Begin token verification.');
+      try {
+        await api.getSystemInfo();
+      } catch (err) {
+        const error = err as AxiosError<GeneralResponse<SystemInfoData>>;
+        if (
+          error.isAxiosError &&
+          error.response &&
+          error.response.status < 500 &&
+          error.response.data.code != 1
+        ) {
+          this.$store.commit('login/logout');
+          console.log('Token verification failed, logout.');
+        }
+      }
+    },
   },
   mounted: function () {
     this.$store.commit('login/listen', (account: AccountObject | null) =>
@@ -57,27 +77,7 @@ export default defineComponent({
         });
       }
     }, 20 * 1000);
-    setInterval(() => {
-      if (this.state.account) {
-        void api
-          .getSystemInfo()
-          .catch((error: AxiosError<GeneralResponse<SystemInfoData>>) => {
-            if (
-              error.isAxiosError &&
-              error.response &&
-              error.response.status < 500 &&
-              error.response.data.code != 1
-            ) {
-              this.$store.commit('login/logout');
-              this.$q.notify({
-                message: '登录凭据已失效',
-                type: 'negative',
-                position: 'center',
-              });
-            }
-          });
-      }
-    }, 5 * 1000);
+    setInterval(() => void this.checkLoginStatus(), 5 * 1000);
   },
   computed: {
     state: function () {

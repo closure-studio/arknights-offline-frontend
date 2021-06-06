@@ -16,7 +16,10 @@ export interface LoginStateInterface {
 }
 
 const state = function(): LoginStateInterface {
-  return { account: null, listeners: [] };
+  return {
+    account: LocalStorage.getItem('account')?.valueOf() as AccountObject,
+    listeners: []
+  };
 };
 
 const actions: ActionTree<LoginStateInterface, StateInterface> = {
@@ -52,18 +55,10 @@ const actions: ActionTree<LoginStateInterface, StateInterface> = {
 };
 
 const mutations: MutationTree<LoginStateInterface> = {
-  login(state, account?: AccountObject) {
-    account =
-      account || (LocalStorage.getItem('account')?.valueOf() as AccountObject);
-    if (!account) {
-      throw new Error(
-        'No account existed in local storage or account argument has not been specified'
-      );
-    } else {
-      LocalStorage.set('account', account);
-      state.account = account;
-      state.listeners.forEach(listener => listener(state.account));
-    }
+  login(state, account: AccountObject) {
+    LocalStorage.set('account', account);
+    state.account = account;
+    state.listeners.forEach(listener => listener(state.account));
   },
   logout(state) {
     state.account = null;

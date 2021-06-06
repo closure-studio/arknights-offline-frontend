@@ -10,6 +10,7 @@
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
 import { Store } from 'vuex';
+
 import { StateInterface } from '../store';
 import { baseApi } from '../api';
 
@@ -19,9 +20,7 @@ export default defineComponent({
   },
   methods: {
     makeWebsocketConnection: function () {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const store: Store<StateInterface> = this.$store;
-
+      const store = this.$store as Store<StateInterface>;
       const token = store.state.login.account?.token;
 
       if (!token) {
@@ -79,15 +78,19 @@ export default defineComponent({
       this.onWsActivity(account, message)
     );
     setInterval(() => {
-      if (!this.connection) {
-        this.makeWebsocketConnection();
+      const store = this.$store as Store<StateInterface>;
+      if (store.state.login.account) {
+        if (!this.connection) {
+          this.makeWebsocketConnection();
+        }
+      } else {
+        this.connection?.close(undefined, 'User Logout');
       }
-    }, 1000);
+    }, 2000);
   },
   computed: {
     activity: function () {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const store: Store<StateInterface> = this.$store;
+      const store = this.$store as Store<StateInterface>;
       return store.state.activity;
     },
   },
