@@ -26,15 +26,17 @@
         </q-form>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn color="primary" flat label="取消" @click="onCancelClick" /><q-btn
+        <q-btn color="primary" flat label="取消" @click="onCancelClick" />
+        <q-btn
           color="primary"
           flat
           label="确认添加"
           @click="onOKClick"
           :disable="!account || !password || device == null"
         />
-      </q-card-actions> </q-card
-  ></q-dialog>
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
@@ -74,7 +76,7 @@ export default defineComponent({
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
-      this.$emit('ok', { account: this.account, password: this.password });
+      this.$emit('ok');
       // or with payload: this.$emit('ok', { ... })
       // then hiding dialog
       this.hide();

@@ -1,9 +1,9 @@
 <template>
   <q-page>
     <q-card class="absolute-full">
-      <q-img src="~assets/background.webp"
-        ><div class="absolute-bottom text-center">帐号信息</div></q-img
-      >
+      <q-img src="~assets/background.webp">
+        <div class="absolute-bottom text-center">帐号信息</div>
+      </q-img>
       <q-list bordered separator class="shadow-1" v-if="userData">
         <q-item>
           <q-item-section avatar>
@@ -42,15 +42,11 @@
         </q-item>
       </q-list>
 
-      <q-circular-progress
-        class="absolute-center"
-        size="md"
-        color="primary"
-        v-if="loading"
-        indeterminate
-      />
+      <q-inner-loading :showing="loading">
+        <q-spinner size="lg" color="primary" />
+      </q-inner-loading>
 
-      <q-card-actions class="absolute-bottom" align="evenly">
+      <q-card-actions align="evenly">
         <q-btn flat color="primary" @click="newAccount">添加托管帐号</q-btn>
         <q-btn flat icon="refresh" @click="refreshAccountData">刷新数据</q-btn>
       </q-card-actions>
@@ -101,11 +97,10 @@ export default defineComponent({
       }
     },
     newAccount: async function () {
-      const data = (await utils.dialog(this.$q, {
+      return await utils.dialog(this.$q, {
         component: GameAccountForm,
         parent: this,
-      })) as { account: string; password: string };
-      void utils.dialog(this.$q, { message: String(data) });
+      });
     },
     platformName: function (platform: number): { icon: string; name: string } {
       switch (platform) {
